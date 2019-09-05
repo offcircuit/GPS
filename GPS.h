@@ -2,6 +2,9 @@
 #define GPS_H
 
 #include <SoftwareSerial.h>
+#include <Arduino.h>
+
+#define GPS_SERIAL_CYCLES 0x8000
 
 struct GPGGA {
   uint8_t hour, minute, second;
@@ -96,9 +99,9 @@ class GPS {
 
     String readString() {
       String data;
-      uint16_t time = millis();
+      uint16_t cycle = GPS_SERIAL_CYCLES;
       do while (_serial->available()) data += char(_serial->read());
-      while (millis() < (time + 1000));
+      while (cycle--);
       return data;
     }
 
@@ -196,7 +199,7 @@ class GPS {
       String data = NMEA(readString(), "$GPVTG");
 
       if (result.checksum = checksum(data)) {
-        
+
         getFloat(data, result.TCourse);
         getChar(data, result.TReference);
         getFloat(data, result.MCourse);
@@ -217,14 +220,14 @@ class GPS {
       String data = NMEA(readString(), "$GPZDA");
 
       if (result.checksum = checksum(data)) {
-        
+
         getTime(data, result.hour, result.minute, result.second, result.millis);
         getInt8(data, result.day);
         getInt8(data, result.month);
         getInt16(data, result.year);
         getInt8(data, result.localHour);
         getInt8(data, result.localMinute);
-        
+
         return result;
       }
     }
