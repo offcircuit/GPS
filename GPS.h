@@ -81,13 +81,13 @@ class GPS {
     bool checksum(String &data) {
       uint8_t n = 0;
       for (uint8_t i = 1; i < data.lastIndexOf("*"); i++) n ^= byte(data[i]);
-      return data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(n, HEX));
+      data.remove(0, data.indexOf(",") + 1);
+      return data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String((n >> 4), HEX) + String((n & 0xF), HEX));
     }
 
     String NMEA(String data, String record) {
       data = data.substring(data.lastIndexOf(record), data.indexOf("$", data.lastIndexOf(record) + 1));
       data.trim();
-      data.remove(0, data.indexOf(",") + 1);
       return data;
     }
 
@@ -241,5 +241,6 @@ class GPS {
       data.remove(0, data.indexOf(",") + 1);
     }
 };
+
 
 #endif
