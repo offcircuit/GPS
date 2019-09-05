@@ -97,17 +97,9 @@ class GPS {
     String readString() {
       String data;
       uint16_t time = millis();
-
-      do if (_serial->available()) while (_serial->available()) data += char(_serial->read());
+      do while (_serial->available()) data += char(_serial->read());
       while (millis() < (time + 1000));
       return data;
-    }
-
-    bool checksum(String &data) {
-      uint8_t n = 0;
-      for (uint8_t i = 1; i < data.lastIndexOf("*"); i++) n ^= byte(data[i]);
-      data.remove(0, data.indexOf(",") + 1);
-      return data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String((n >> 4), HEX) + String((n & 0xF), HEX));
     }
 
     String NMEA(String data, String record) {
@@ -238,6 +230,13 @@ class GPS {
     }
 
   private:
+    bool checksum(String &data) {
+      uint8_t n = 0;
+      for (uint8_t i = 1; i < data.lastIndexOf("*"); i++) n ^= byte(data[i]);
+      data.remove(0, data.indexOf(",") + 1);
+      return data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String((n >> 4), HEX) + String((n & 0xF), HEX));
+    }
+
     void getChar(String &data, char &val) {
       val = data.charAt(0);
       data.remove(0, data.indexOf(",") + 1);
