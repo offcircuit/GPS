@@ -1,0 +1,40 @@
+##################################################
+# Syntax Coloring Map For Morse-library
+##################################################
+
+##################################################
+# Classes, datatypes and C++ keywords	(KEYWORD1)
+##################################################
+
+Morse	KEYWORD1
+
+##################################################
+# Methods and Functions			(KEYWORD2)
+##################################################
+		
+begin	KEYWORD2
+clear	KEYWORD2
+listen	KEYWORD2
+print	KEYWORD2
+println	KEYWORD2
+read	KEYWORD2
+receiver	KEYWORD2
+transmiter	KEYWORD2
+
+##################################################
+# Constants				(LITERAL1)
+##################################################
+
+MORSE_NULL	LITERAL1
+MORSE_DIT	LITERAL1
+MORSE_DI	LITERAL1
+MORSE_DAH	LITERAL1
+MORSE_GAP	LITERAL1
+MORSE_CHAR	LITERAL1
+MORSE_SPACE	LITERAL1
+MORSE_EOL	LITERAL1
+
+##################################################
+# Built-in variables			(LITERAL2)
+##################################################
+
