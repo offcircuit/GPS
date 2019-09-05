@@ -78,7 +78,7 @@ class GPS {
       return data;
     }
 
-    bool checksum(String data) {
+    bool checksum(String &data) {
       uint8_t n = 0;
       for (uint8_t i = 1; i < data.lastIndexOf("*"); i++) n ^= byte(data[i]);
       return data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(n, HEX));
@@ -87,6 +87,7 @@ class GPS {
     String NMEA(String data, String record) {
       data = data.substring(data.lastIndexOf(record), data.indexOf("$", data.lastIndexOf(record) + 1));
       data.trim();
+      data.remove(0, data.indexOf(",") + 1);
       return data;
     }
 
@@ -97,34 +98,17 @@ class GPS {
 
       if (result.checksum = checksum(data)) {
 
-        data.remove(0, data.indexOf(",") + 1);
-
         getTime(data, result.hour, result.minute, result.second, result.millis);
         getGeoposition(data, result.latitude, result.NS, result.longitude, result.WE);
-
-        result.indicator = data.substring(0, data.indexOf(",")).toInt();
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.satellites = data.substring(0, data.indexOf(",")).toInt();
-        data.remove(0, data.indexOf(",") + 1);
-
+        getInt8(data, result.indicator);
+        getInt8(data, result.satellites);
         getFloat(data, result.HDPO);
-
         getFloat(data, result.altitude);
-
-        result.altitude_unit = data.charAt(0);
-        data.remove(0, data.indexOf(",") + 1);
-
+        getChar(data, result.altitude_unit);
         getFloat(data, result.geoidal);
-
-        result.geoidal_unit = data.charAt(0);
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.age = data.substring(0, data.indexOf(",")).toInt();
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.station = data.substring(0, data.indexOf(",")).toInt();
-        data.remove(0, data.indexOf(",") + 1);
+        getChar(data, result.geoidal_unit);
+        getInt16(data, result.age);
+        getInt16(data, result.station);
 
         return result;
       }
@@ -137,15 +121,12 @@ class GPS {
 
       if (result.checksum = checksum(data)) {
 
-        data.remove(0, data.indexOf(",") + 1);
-
         getGeoposition(data, result.latitude, result.NS, result.longitude, result.WE);
         getTime(data, result.hour, result.minute, result.second, result.millis);
+        getChar(data, result.status);
+        getChar(data, result.mode);
 
-        result.status = data.charAt(0);
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.mode = data.charAt(0);
+        return result;
       }
     }
 
@@ -156,7 +137,7 @@ class GPS {
 
       if (result.checksum = checksum(data)) {
 
-        data.remove(0, data.indexOf(",") + 1);
+        return result;
       }
     }
 
@@ -167,7 +148,7 @@ class GPS {
 
       if (result.checksum = checksum(data)) {
 
-        data.remove(0, data.indexOf(",") + 1);
+        return result;
       }
     }
 
@@ -178,25 +159,15 @@ class GPS {
 
       if (result.checksum = checksum(data)) {
 
-        data.remove(0, data.indexOf(",") + 1);
-
         getTime(data, result.hour, result.minute, result.second, result.millis);
-
-        result.status = data.charAt(0);
-        data.remove(0, data.indexOf(",") + 1);
-
+        getChar(data, result.status);
         getGeoposition(data, result.latitude, result.NS, result.longitude, result.WE);
-
         getFloat(data, result.speed);
         getFloat(data, result.course);
-
         getDate(data, result.day, result.month, result.year);
-
         getFloat(data, result.variation);
-        result.direction = data.charAt(0);
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.mode = data.charAt(0);
+        getChar(data, result.direction);
+        getChar(data, result.mode);
 
         return result;
       }
@@ -209,22 +180,27 @@ class GPS {
 
       if (result.checksum = checksum(data)) {
 
-        data.remove(0, data.indexOf(",") + 1);
+        return result;
       }
     }
 
     GPZDA readZDA() {
-      GPGSA result;
+      GPZDA result;
 
       String data = NMEA(readString(), "$GPZDA");
 
       if (result.checksum = checksum(data)) {
 
-        data.remove(0, data.indexOf(",") + 1);
+        return result;
       }
     }
 
   private:
+    void getChar(String &data, char &val) {
+      val = data.charAt(0);
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
     void getDate(String &data, uint8_t &day, uint8_t &month, uint8_t &year) {
       day = data.substring(0, 2).toInt();
       month = data.substring(2, 4).toInt();
@@ -247,7 +223,12 @@ class GPS {
       data.remove(0, data.indexOf(",") + 1);
     }
 
-    void getInt(String &data, uint8_t &val) {
+    void getInt8(String &data, uint8_t &val) {
+      val = data.substring(0, data.indexOf(",")).toInt();
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
+    void getInt16(String &data, uint16_t &val) {
       val = data.substring(0, data.indexOf(",")).toInt();
       data.remove(0, data.indexOf(",") + 1);
     }
