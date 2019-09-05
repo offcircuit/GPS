@@ -5,7 +5,8 @@
 
 struct GPGGA {
   char altitude_unit, geoidal_unit;
-  uint8_t year, month, day, hour, minute, second, millis;
+  uint8_t hour, minute, second;
+  uint16_t millis;
   uint8_t indicator, satellites;
   float latitude, longitude, altitude;
   float HDPO, geoidal;
@@ -14,31 +15,46 @@ struct GPGGA {
 };
 
 struct GPGLL {
-  
+  char status, mode;
+  uint8_t hour, minute, second;
+  uint16_t millis;
+  float latitude, longitude, altitude;
+  bool NS, WE, checksum;
 };
 
 struct GPGSA {
-  
+  uint8_t mode_1;
+  char mode_2;
+  float PDOP, HDOP;
+  bool checksum;
 };
 
 struct GPGSV {
-  
+  uint8_t messages, msg_id, satellites, sat_id, elevation;
+  uint16_t azinmuth;
+  bool checksum;
 };
 
 struct GPRMC {
   char status, mode, direction;
-  uint8_t year, month, day, hour, minute, second, millis;
+  uint8_t year, month, day, hour, minute, second;
+  uint16_t millis;
   float latitude, longitude;
   float speed, course, variation;
   bool NS, WE, checksum;
 };
 
-struct VTG {
-  
+struct GPVTG {
+  char uints, mode;
+  float Tcourse, Mcourse, speed;
+  bool Treference, Mreference, checksum;
+
 };
 
-struct ZDA {
-  
+struct GPZDA {
+  uint8_t hour, minute, second, day, month;
+  uint16_t year, millis, hours, minutes;
+  bool checksum;
 };
 
 class GPS {
@@ -74,57 +90,6 @@ class GPS {
       return data;
     }
 
-    GPRMC readRMC() {
-      GPRMC result;
-
-      String data = NMEA(readString(), "$GPRMC");
-
-      if (result.checksum = data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
-
-        data.remove(0, data.indexOf(",") + 1);
-        Serial.println(data);
-
-        result.hour = data.substring(0, 2).toInt(); 
-        result.minute = data.substring(2, 4).toInt(); 
-        result.second = data.substring(4, 6).toInt();
-        result.millis = data.substring(7, 10).toInt();
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.status = data.charAt(0);
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.latitude = data.substring(0, data.indexOf(",")).toFloat() / 100;
-        data.remove(0, data.indexOf(",") + 1);
-        result.NS = data.substring(0, data.indexOf(",")) == "S";
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.longitude = data.substring(0, data.indexOf(",")).toFloat() / 100;
-        data.remove(0, data.indexOf(",") + 1);
-        result.WE = data.substring(0, data.indexOf(",")) == "E";
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.speed = data.substring(0, data.indexOf(",")).toFloat();
-        data.remove(0, data.indexOf(",") + 1);
-        result.course = data.substring(0, data.indexOf(",")).toFloat();
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.day = data.substring(0, 2).toInt(); 
-        result.month = data.substring(2, 4).toInt(); 
-        result.year = data.substring(4, 6).toInt();
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.variation = data.substring(0, data.indexOf(",")).toFloat();
-        data.remove(0, data.indexOf(",") + 1);
-        result.direction = data.charAt(0);
-        data.remove(0, data.indexOf(",") + 1);
-
-        result.mode = data.charAt(0);
-        data.remove(0, data.indexOf(",") + 1);
-
-        return result;
-      }
-    }
-    
     GPGGA readGGA() {
       GPGGA result;
 
@@ -134,8 +99,164 @@ class GPS {
 
         data.remove(0, data.indexOf(",") + 1);
 
+        getTime(data, result.hour, result.minute, result.second, result.millis);
+        getGeoposition(data, result.latitude, result.NS, result.longitude, result.WE);
+
+        result.indicator = data.substring(0, data.indexOf(",")).toInt();
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.satellites = data.substring(0, data.indexOf(",")).toInt();
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.HDPO = data.substring(0, data.indexOf(",")).toFloat();
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.altitude = data.substring(0, data.indexOf(",")).toFloat();
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.altitude_unit = data.charAt(0);
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.geoidal = data.substring(0, data.indexOf(",")).toFloat();
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.geoidal_unit = data.charAt(0);
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.age = data.substring(0, data.indexOf(",")).toInt();
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.station = data.substring(0, data.indexOf(",")).toInt();
+        data.remove(0, data.indexOf(",") + 1);
+
         return result;
       }
+    }
+
+    GPGLL readGLL() {
+      GPGLL result;
+
+      String data = NMEA(readString(), "$GPGLL");
+
+      if (result.checksum = data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
+
+        data.remove(0, data.indexOf(",") + 1);
+
+        getGeoposition(data, result.latitude, result.NS, result.longitude, result.WE);
+        getTime(data, result.hour, result.minute, result.second, result.millis);
+
+        result.status = data.charAt(0);
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.mode = data.charAt(0);
+      }
+    }
+
+    GPGSA readGSA() {
+      GPGSA result;
+
+      String data = NMEA(readString(), "$GPGSA");
+
+      if (result.checksum = data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
+
+        data.remove(0, data.indexOf(",") + 1);
+      }
+    }
+
+    GPGSV readGSV() {
+      GPGSV result;
+
+      String data = NMEA(readString(), "$GPGSV");
+
+      if (result.checksum = data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
+
+        data.remove(0, data.indexOf(",") + 1);
+      }
+    }
+
+    GPRMC readRMC() {
+      GPRMC result;
+
+      String data = NMEA(readString(), "$GPRMC");
+
+      if (result.checksum = data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
+
+        data.remove(0, data.indexOf(",") + 1);
+
+        getTime(data, result.hour, result.minute, result.second, result.millis);
+
+        result.status = data.charAt(0);
+        data.remove(0, data.indexOf(",") + 1);
+
+        getGeoposition(data, result.latitude, result.NS, result.longitude, result.WE);
+
+        result.speed = data.substring(0, data.indexOf(",")).toFloat();
+        data.remove(0, data.indexOf(",") + 1);
+        result.course = data.substring(0, data.indexOf(",")).toFloat();
+        data.remove(0, data.indexOf(",") + 1);
+
+        getDate(data, result.day, result.month, result.year);
+
+        result.variation = data.substring(0, data.indexOf(",")).toFloat();
+        data.remove(0, data.indexOf(",") + 1);
+        result.direction = data.charAt(0);
+        data.remove(0, data.indexOf(",") + 1);
+
+        result.mode = data.charAt(0);
+
+        return result;
+      }
+    }
+
+    GPVTG readVTG() {
+      GPVTG result;
+
+      String data = NMEA(readString(), "$GPVTG");
+
+      if (result.checksum = data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
+
+        data.remove(0, data.indexOf(",") + 1);
+      }
+    }
+
+    GPZDA readZDA() {
+      GPGSA result;
+
+      String data = NMEA(readString(), "$GPZDA");
+
+      if (result.checksum = data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
+
+        data.remove(0, data.indexOf(",") + 1);
+      }
+    }
+
+  private:
+
+    void getTime(String &data, uint8_t &hour, uint8_t &minute, uint8_t &second, uint16_t &millis) {
+      hour = data.substring(0, 2).toInt();
+      minute = data.substring(2, 4).toInt();
+      second = data.substring(4, 6).toInt();
+      millis = data.substring(7, 10).toInt();
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
+    void getDate(String &data, uint8_t &day, uint8_t &month, uint8_t &year) {
+      day = data.substring(0, 2).toInt();
+      month = data.substring(2, 4).toInt();
+      year = data.substring(4, 6).toInt();
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
+    void getGeoposition(String &data, float &latitude, bool &ns, float &longitude, bool &we) {
+      latitude = data.substring(0, data.indexOf(",")).toFloat() / 100;
+      data.remove(0, data.indexOf(",") + 1);
+      ns = data.substring(0, data.indexOf(",")) == "S";
+      data.remove(0, data.indexOf(",") + 1);
+
+      longitude = data.substring(0, data.indexOf(",")).toFloat() / 100;
+      data.remove(0, data.indexOf(",") + 1);
+      we = data.substring(0, data.indexOf(",")) == "E";
+      data.remove(0, data.indexOf(",") + 1);
     }
 };
 
