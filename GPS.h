@@ -2,14 +2,43 @@
 #define GPS_H
 
 #include <SoftwareSerial.h>
-#include "Arduino.h"
 
+struct GPGGA {
+  char altitude_unit, geoidal_unit;
+  uint8_t year, month, day, hour, minute, second, millis;
+  uint8_t indicator, satellites;
+  float latitude, longitude, altitude;
+  float HDPO, geoidal;
+  bool NS, WE, checksum;
+  uint16_t age, station;
+};
+
+struct GPGLL {
+  
+};
+
+struct GPGSA {
+  
+};
+
+struct GPGSV {
+  
+};
 
 struct GPRMC {
   char status, mode, direction;
   uint8_t year, month, day, hour, minute, second, millis;
-  float latitude, longitude, speed, course, variation;
-  bool NS, WE;
+  float latitude, longitude;
+  float speed, course, variation;
+  bool NS, WE, checksum;
+};
+
+struct VTG {
+  
+};
+
+struct ZDA {
+  
 };
 
 class GPS {
@@ -35,28 +64,30 @@ class GPS {
 
     uint8_t checksum(String data) {
       uint8_t n = 0;
-      data = data.substring(1, data.lastIndexOf("*"));
-      for (uint8_t i = 0; i < data.length(); i++) {
-        n ^= byte(data[i]);
-      }
+      for (uint8_t i = 1; i < data.lastIndexOf("*"); i++) n ^= byte(data[i]);
       return n;
     }
 
     String NMEA(String data, String record) {
-      return data.substring(data.lastIndexOf(record), data.indexOf("$", data.lastIndexOf(record) + 1));
+      data = data.substring(data.lastIndexOf(record), data.indexOf("$", data.lastIndexOf(record) + 1));
+      data.trim();
+      return data;
     }
 
     GPRMC readRMC() {
       GPRMC result;
-      String data = (NMEA(readString(), "$GPRMC"));
-      data.trim();
 
-      if (data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
+      String data = NMEA(readString(), "$GPRMC");
+
+      if (result.checksum = data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
 
         data.remove(0, data.indexOf(",") + 1);
         Serial.println(data);
 
-        result.hour = data.substring(0, 2).toInt(); result.minute = data.substring(2, 4).toInt(); result.second = data.substring(4, 6).toInt();
+        result.hour = data.substring(0, 2).toInt(); 
+        result.minute = data.substring(2, 4).toInt(); 
+        result.second = data.substring(4, 6).toInt();
+        result.millis = data.substring(7, 10).toInt();
         data.remove(0, data.indexOf(",") + 1);
 
         result.status = data.charAt(0);
@@ -77,7 +108,9 @@ class GPS {
         result.course = data.substring(0, data.indexOf(",")).toFloat();
         data.remove(0, data.indexOf(",") + 1);
 
-        result.day = data.substring(0, 2).toInt(); result.month = data.substring(2, 4).toInt(); result.year = data.substring(4, 6).toInt();
+        result.day = data.substring(0, 2).toInt(); 
+        result.month = data.substring(2, 4).toInt(); 
+        result.year = data.substring(4, 6).toInt();
         data.remove(0, data.indexOf(",") + 1);
 
         result.variation = data.substring(0, data.indexOf(",")).toFloat();
@@ -91,7 +124,19 @@ class GPS {
         return result;
       }
     }
+    
+    GPGGA readGGA() {
+      GPGGA result;
 
+      String data = NMEA(readString(), "$GPGGA");
+
+      if (result.checksum = data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String(checksum(data), HEX))) {
+
+        data.remove(0, data.indexOf(",") + 1);
+
+        return result;
+      }
+    }
 };
 
 
