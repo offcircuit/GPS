@@ -4,22 +4,31 @@
 #include <SoftwareSerial.h>
 
 struct GPGGA {
-  char altitude_unit, geoidal_unit;
   uint8_t hour, minute, second;
   uint16_t millis;
-  uint8_t indicator, satellites;
-  float latitude, longitude, altitude;
-  float HDPO, geoidal;
-  bool NS, WE, checksum;
-  uint16_t age, station;
+  float latitude, longitude;
+  bool NS, WE;
+  uint8_t fix;
+  uint8_t satellites;
+  float HDPO;
+  float altitude;
+  char altitude_u;
+  float geoidal;
+  char geoidal_u;
+  uint16_t age;
+  uint16_t station;
+  bool checksum;
 };
 
 struct GPGLL {
-  char status, mode;
+  float latitude, longitude;
+  bool NS, WE;
   uint8_t hour, minute, second;
   uint16_t millis;
-  float latitude, longitude, altitude;
-  bool NS, WE, checksum;
+  char status;
+  char mode;
+  float altitude;
+  bool checksum;
 };
 
 struct GPGSA {
@@ -36,24 +45,40 @@ struct GPGSV {
 };
 
 struct GPRMC {
-  char status, mode, direction;
-  uint8_t year, month, day, hour, minute, second;
+  uint8_t hour, minute, second;
   uint16_t millis;
+  char status;
   float latitude, longitude;
-  float speed, course, variation;
-  bool NS, WE, checksum;
+  bool NS, WE;
+  float speed;
+  float course;
+  uint8_t day, month, year;
+  float variation;
+  char direction;
+  char mode;
+  bool checksum;
 };
 
 struct GPVTG {
-  char uints, mode;
-  float Tcourse, Mcourse, speed;
-  bool Treference, Mreference, checksum;
-
+  float TCourse;
+  char TReference;
+  float MCourse;
+  char MReference;
+  float NSpeed;
+  char NSpeed_u;
+  float KSpeed;
+  char KSpeed_u;
+  char mode;
+  bool checksum;
 };
 
 struct GPZDA {
-  uint8_t hour, minute, second, day, month;
-  uint16_t year, millis, hours, minutes;
+  uint8_t hour, minute, second;
+  uint16_t millis;
+  uint8_t day, month;
+  uint16_t year;
+  uint8_t localHour;
+  uint8_t localMinute;
   bool checksum;
 };
 
@@ -100,13 +125,13 @@ class GPS {
 
         getTime(data, result.hour, result.minute, result.second, result.millis);
         getGeoposition(data, result.latitude, result.NS, result.longitude, result.WE);
-        getInt8(data, result.indicator);
+        getInt8(data, result.fix);
         getInt8(data, result.satellites);
         getFloat(data, result.HDPO);
         getFloat(data, result.altitude);
-        getChar(data, result.altitude_unit);
+        getChar(data, result.altitude_u);
         getFloat(data, result.geoidal);
-        getChar(data, result.geoidal_unit);
+        getChar(data, result.geoidal_u);
         getInt16(data, result.age);
         getInt16(data, result.station);
 
@@ -179,6 +204,16 @@ class GPS {
       String data = NMEA(readString(), "$GPVTG");
 
       if (result.checksum = checksum(data)) {
+        
+        getFloat(data, result.TCourse);
+        getChar(data, result.TReference);
+        getFloat(data, result.MCourse);
+        getChar(data, result.MReference);
+        getFloat(data, result.NSpeed);
+        getChar(data, result.NSpeed_u);
+        getFloat(data, result.KSpeed);
+        getChar(data, result.KSpeed_u);
+        getChar(data, result.mode);
 
         return result;
       }
@@ -190,7 +225,14 @@ class GPS {
       String data = NMEA(readString(), "$GPZDA");
 
       if (result.checksum = checksum(data)) {
-
+        
+        getTime(data, result.hour, result.minute, result.second, result.millis);
+        getInt8(data, result.day);
+        getInt8(data, result.month);
+        getInt16(data, result.year);
+        getInt8(data, result.localHour);
+        getInt8(data, result.localMinute);
+        
         return result;
       }
     }
@@ -241,6 +283,5 @@ class GPS {
       data.remove(0, data.indexOf(",") + 1);
     }
 };
-
 
 #endif
