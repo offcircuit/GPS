@@ -7,28 +7,13 @@
 ##################################################
 
 GPS	KEYWORD1
-GPGGA	KEYWORD1
-GPGLL	KEYWORD1
-GPGSA	KEYWORD1
-GPGSV	KEYWORD1
-GPRMC	KEYWORD1
-GPVTG	KEYWORD1
-GPZDA	KEYWORD1
 
 ##################################################
 # Methods and Functions			(KEYWORD2)
 ##################################################
 		
 begin	KEYWORD2
-NMEA	KEYWORD2
-readGGA	KEYWORD2
-readGLL	KEYWORD2
-readGSA	KEYWORD2
-readGSV	KEYWORD2
-readRMC	KEYWORD2
 readString	KEYWORD2
-readVTG	KEYWORD2
-readZDA	KEYWORD2
 
 ##################################################
 # Constants				(LITERAL1)
