@@ -19,14 +19,12 @@ class GPS {
     }
 
     String readString() {
-      String data = "$";
-      uint16_t t = _length;
+      String data = String(0x24);
+      uint16_t lenght = _length;
       while (!_serial->available() || (_serial->read() != 0x24));
-
-      do if (_serial->available() && (data += char(_serial->read())) && t--); while (t);
-
+      do if (_serial->available() && (data += char(_serial->read())) && lenght--); while (lenght);
       data.remove(0, data.indexOf(char(0x0D)));
-      data.remove(data.lastIndexOf("*") + 3);
+      data.remove(data.lastIndexOf(char(0x2A)) + 3);
       data.trim();
       return data;
     }
