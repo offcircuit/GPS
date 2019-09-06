@@ -25,7 +25,7 @@ class GPS {
 
       do if (_serial->available() && (data += char(_serial->read())) && t--); while (t);
 
-      data.remove(0, data.indexOf(char(13)));
+      data.remove(0, data.indexOf(char(0x0D)));
       data.remove(data.lastIndexOf("*") + 3);
       return data;
     }
