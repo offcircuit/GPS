@@ -1,14 +1,14 @@
 #include "GPS.h"
 
-GPS gps(3); 
-// GPS(rx, length)
+GPS gps(3, 4);
+// GPS(rx, tx, length)
 // rx = rx pin
-// length(optional) = message maximum length, default 800;
+// tx = tx pin
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  gps.begin(9600);
+  gps.begin();
   delay(100);
 }
 
