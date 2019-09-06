@@ -2,6 +2,11 @@
 #define GPS_H
 
 #include <SoftwareSerial.h>
+#include <Arduino.h>
+#include <WString.h>
+
+
+class __FlashStringHelper;
 
 class GPS {
   public:
@@ -32,7 +37,7 @@ class GPS {
     }
 
     String write(String data) {
-      if (_serial->print(char(0x24) + data + char(0x2A) + String(checksum(data), HEX) + char(0x0D) + char(0x0A))) return readString();
+      if (_serial->println(char(0x24) + data + char(0x2A) + String(checksum(data), HEX))) return readString();
       return "";
     }
 };
