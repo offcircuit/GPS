@@ -2,7 +2,6 @@
 #define GPS_H
 
 #include <SoftwareSerial.h>
-#include <Arduino.h>
 
 struct GPGGA {
   uint8_t hour, minute, second;
@@ -82,10 +81,9 @@ struct GPZDA {
   uint8_t localMinute;
   bool checksum;
 };
-
 class GPS {
   private:
-    uint8_t _pps;
+    uint16_t _length;
 
     bool checksum(String &data) {
       uint8_t n = 0;
@@ -135,25 +133,32 @@ class GPS {
       hour = data.substring(0, 2).toInt();
       minute = data.substring(2, 4).toInt();
       second = data.substring(4, 6).toInt();
-      millis = data.substring(7, 10).toInt();
+      millis = data.substring(7, 9).toInt();
       data.remove(0, data.indexOf(",") + 1);
     }
   public:
     SoftwareSerial *_serial;
 
-    GPS(uint8_t rx, uint8_t pps): _pps(pps) {
+    GPS(uint8_t rx, uint16_t length = 600): _length(length) {
       _serial = new SoftwareSerial(rx, 4);
     }
 
     void begin(uint32_t baud) {
-      _serial->begin(baud);
+      _serial->begin(9800);
     }
 
     String readString() {
-      String data;
-      digitalWrite(_pps, HIGH);
-      do while (_serial->available()) data += char(_serial->read());
-      while (!digitalRead(_pps));
+      String data = "$";
+      uint16_t t = _length;
+      while (!_serial->available() || (_serial->read() != 0x24));
+
+      do if (_serial->available()) {
+          data += char(_serial->read());
+          t--;
+        } while (t);
+
+      data.remove(0, data.indexOf(char(13)));
+      data.remove(data.lastIndexOf("*") + 3);
       return data;
     }
 
