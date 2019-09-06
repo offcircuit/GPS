@@ -13,8 +13,9 @@ GPS	KEYWORD1
 ##################################################
 		
 begin	KEYWORD2
+checksum	KEYWORD2
 readString	KEYWORD2
-sendcommand	KEYWORD2
+write	KEYWORD2
 
 ##################################################
 # Constants				(LITERAL1)
