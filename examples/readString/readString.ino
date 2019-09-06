@@ -7,9 +7,8 @@ GPS gps(3, 4);
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial.begin(115200);
   gps.begin();
-  delay(100);
 }
 
 void loop() {
