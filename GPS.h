@@ -2,11 +2,6 @@
 #define GPS_H
 
 #include <SoftwareSerial.h>
-#include <Arduino.h>
-#include <WString.h>
-
-
-class __FlashStringHelper;
 
 class GPS {
   public:
