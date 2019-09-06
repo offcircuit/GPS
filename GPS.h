@@ -10,7 +10,7 @@ class GPS {
   public:
     SoftwareSerial *_serial;
 
-    GPS(uint8_t rx, uint16_t length = 800): _length(length) {
+    explicit GPS(uint8_t rx, uint16_t length = 800): _length(length) {
       _serial = new SoftwareSerial(rx, rx);
     }
 
@@ -27,6 +27,7 @@ class GPS {
 
       data.remove(0, data.indexOf(char(0x0D)));
       data.remove(data.lastIndexOf("*") + 3);
+      data.trim();
       return data;
     }
 };
