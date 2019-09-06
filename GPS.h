@@ -151,6 +151,7 @@ class GPS {
 
     String readString() {
       String data;
+      digitalWrite(_pps, HIGH);
       do while (_serial->available()) data += char(_serial->read());
       while (!digitalRead(_pps));
       return data;
