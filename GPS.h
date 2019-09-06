@@ -11,8 +11,8 @@ class GPS {
       _serial = new SoftwareSerial(rx, tx);
     }
 
-    void begin(uint32_t baud) {
-      _serial->begin(baud);
+    void begin() {
+      _serial->begin(9600);
     }
 
     uint8_t checksum(String data) {
@@ -31,7 +31,7 @@ class GPS {
       return data;
     }
 
-     String write(String data) {
+    String write(String data) {
       if (_serial->print(char(0x24) + data + char(0x2A) + String(checksum(data), HEX) + char(0x0D) + char(0x0A))) return readString();
       return "";
     }
