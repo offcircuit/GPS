@@ -4,8 +4,6 @@
 #include <SoftwareSerial.h>
 #include <Arduino.h>
 
-#define GPS_SERIAL_CYCLES 0x8000
-
 struct GPGGA {
   uint8_t hour, minute, second;
   uint16_t millis;
@@ -86,11 +84,65 @@ struct GPZDA {
 };
 
 class GPS {
+  private:
+    uint8_t _pps;
+
+    bool checksum(String &data) {
+      uint8_t n = 0;
+      for (uint8_t i = 1; i < data.lastIndexOf("*"); i++) n ^= byte(data[i]);
+      data.remove(0, data.indexOf(",") + 1);
+      return data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String((n >> 4), HEX) + String((n & 0xF), HEX));
+    }
+
+    void getChar(String &data, char &val) {
+      val = data.charAt(0);
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
+    void getDate(String &data, uint8_t &day, uint8_t &month, uint8_t &year) {
+      day = data.substring(0, 2).toInt();
+      month = data.substring(2, 4).toInt();
+      year = data.substring(4, 6).toInt();
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
+    void getFloat(String &data, float &val) {
+      val = data.substring(0, data.indexOf(",")).toFloat() / 100;
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
+    void getGeoposition(String &data, float &latitude, bool &ns, float &longitude, bool &we) {
+      getFloat(data, latitude);
+      ns = data.substring(0, data.indexOf(",")) == "S";
+      data.remove(0, data.indexOf(",") + 1);
+
+      getFloat(data, longitude);
+      we = data.substring(0, data.indexOf(",")) == "E";
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
+    void getInt8(String &data, uint8_t &val) {
+      val = data.substring(0, data.indexOf(",")).toInt();
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
+    void getInt16(String &data, uint16_t &val) {
+      val = data.substring(0, data.indexOf(",")).toInt();
+      data.remove(0, data.indexOf(",") + 1);
+    }
+
+    void getTime(String &data, uint8_t &hour, uint8_t &minute, uint8_t &second, uint16_t &millis) {
+      hour = data.substring(0, 2).toInt();
+      minute = data.substring(2, 4).toInt();
+      second = data.substring(4, 6).toInt();
+      millis = data.substring(7, 10).toInt();
+      data.remove(0, data.indexOf(",") + 1);
+    }
   public:
     SoftwareSerial *_serial;
 
-    GPS(uint8_t rx, uint8_t tx) {
-      _serial = new SoftwareSerial(rx, tx);
+    GPS(uint8_t rx, uint8_t pps): _pps(pps) {
+      _serial = new SoftwareSerial(rx, 4);
     }
 
     void begin(uint32_t baud) {
@@ -99,9 +151,8 @@ class GPS {
 
     String readString() {
       String data;
-      uint16_t cycle = GPS_SERIAL_CYCLES;
       do while (_serial->available()) data += char(_serial->read());
-      while (cycle--);
+      while (!digitalRead(_pps));
       return data;
     }
 
@@ -230,59 +281,6 @@ class GPS {
 
         return result;
       }
-    }
-
-  private:
-    bool checksum(String &data) {
-      uint8_t n = 0;
-      for (uint8_t i = 1; i < data.lastIndexOf("*"); i++) n ^= byte(data[i]);
-      data.remove(0, data.indexOf(",") + 1);
-      return data.substring(data.lastIndexOf("*") + 1).equalsIgnoreCase(String((n >> 4), HEX) + String((n & 0xF), HEX));
-    }
-
-    void getChar(String &data, char &val) {
-      val = data.charAt(0);
-      data.remove(0, data.indexOf(",") + 1);
-    }
-
-    void getDate(String &data, uint8_t &day, uint8_t &month, uint8_t &year) {
-      day = data.substring(0, 2).toInt();
-      month = data.substring(2, 4).toInt();
-      year = data.substring(4, 6).toInt();
-      data.remove(0, data.indexOf(",") + 1);
-    }
-
-    void getFloat(String &data, float &val) {
-      val = data.substring(0, data.indexOf(",")).toFloat() / 100;
-      data.remove(0, data.indexOf(",") + 1);
-    }
-
-    void getGeoposition(String &data, float &latitude, bool &ns, float &longitude, bool &we) {
-      getFloat(data, latitude);
-      ns = data.substring(0, data.indexOf(",")) == "S";
-      data.remove(0, data.indexOf(",") + 1);
-
-      getFloat(data, longitude);
-      we = data.substring(0, data.indexOf(",")) == "E";
-      data.remove(0, data.indexOf(",") + 1);
-    }
-
-    void getInt8(String &data, uint8_t &val) {
-      val = data.substring(0, data.indexOf(",")).toInt();
-      data.remove(0, data.indexOf(",") + 1);
-    }
-
-    void getInt16(String &data, uint16_t &val) {
-      val = data.substring(0, data.indexOf(",")).toInt();
-      data.remove(0, data.indexOf(",") + 1);
-    }
-
-    void getTime(String &data, uint8_t &hour, uint8_t &minute, uint8_t &second, uint16_t &millis) {
-      hour = data.substring(0, 2).toInt();
-      minute = data.substring(2, 4).toInt();
-      second = data.substring(4, 6).toInt();
-      millis = data.substring(7, 10).toInt();
-      data.remove(0, data.indexOf(",") + 1);
     }
 };
 
