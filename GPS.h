@@ -24,7 +24,7 @@ class GPS {
     }
 
     String readString() {
-      String data = String(0x24);
+      String data;
       uint16_t length = 800;
       do if (_serial->available() && (data += char(_serial->read())) && length--); while (length);
       return data;
