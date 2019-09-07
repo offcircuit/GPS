@@ -21,16 +21,16 @@ class GPS {
       return n;
     }
 
+    String print(String data) {
+      if (_serial->println(char(0x24) + data + char(0x2A) + String(checksum(data), HEX))) return readString();
+      return "";
+    }
+
     String readString() {
       String data = String(0x24);
       uint16_t length = 800;
       do if (_serial->available() && (data += char(_serial->read())) && length--); while (length);
       return data;
-    }
-
-    String print(String data) {
-      if (_serial->println(char(0x24) + data + char(0x2A) + String(checksum(data), HEX))) return readString();
-      return "";
     }
 };
 
