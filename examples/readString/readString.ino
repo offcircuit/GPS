@@ -1,7 +1,7 @@
 #include "GPS.h"
 
 GPS gps(3, 4);
-// GPS(rx, tx, length)
+// GPS(rx, tx)
 // rx = rx pin
 // tx = tx pin
 
