@@ -24,11 +24,7 @@ class GPS {
     String readString() {
       String data = String(0x24);
       uint16_t length = 800;
-      while (!_serial->available() || (_serial->read() != 0x24));
       do if (_serial->available() && (data += char(_serial->read())) && length--); while (length);
-      data.remove(0, data.indexOf(char(0x24)));
-      data.remove(data.lastIndexOf(char(0x2A)) + 3);
-      data.trim();
       return data;
     }
 
