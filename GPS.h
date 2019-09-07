@@ -27,15 +27,15 @@ class GPS {
     }
 
     String readString(uint16_t length = 0) {
-      String data;
-      if (length) do while (_serial->available()) data += char(_serial->read()); while (data.length() < length);
-      else do while (_serial->available()) data += char(_serial->read()); while (length++ < 0xFFFF);
+      String data = "";
+      uint16_t exit = 0;
+        if (length) do while (_serial->available()) data += char(_serial->read()); while ((data.length() < length) && (exit++ < 0xFFFF));
+        else do while (_serial->available()) data += char(_serial->read()); while (length++ < 0xFFFF);
       return data;
     }
 
     String write(char* data, uint8_t length) {
       _serial->write(data, length);
-      while (!_serial->available());
       return readString();
     }
 
