@@ -2,8 +2,8 @@
 
 GPS gps(3, 4);
 // GPS(rx, tx)
-// rx = rx pin
-// tx = tx pin
+// rx pin
+// tx pin
 
 void setup() {
   // put your setup code here, to run once:
