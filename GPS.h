@@ -26,10 +26,13 @@ class GPS {
       return readString();
     }
 
-    String readString() {
+    String readString(uint16_t length = 0) {
       String data;
-      uint16_t length = 800;
-      do if (_serial->available() && (data += char(_serial->read())) && length--); while (length);
+      if (length) {
+        do if (_serial->available() && (data += char(_serial->read())) && length--); while (length);
+      } else {
+        while (_serial->available()) data += char(_serial->read());
+      }
       return data;
     }
 
