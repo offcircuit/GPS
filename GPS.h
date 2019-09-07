@@ -3,8 +3,6 @@
 
 #include <SoftwareSerial.h>
 
-#define CMD_RESET
-
 class GPS {
   public:
     SoftwareSerial *_serial;
@@ -23,6 +21,11 @@ class GPS {
       return n;
     }
 
+    String print(String data) {
+      _serial->println(char(0x24) + data + char(0x2A) + String(checksum(data), HEX));
+      return readString();
+    }
+
     String readString() {
       String data;
       uint16_t length = 800;
@@ -34,6 +37,7 @@ class GPS {
       _serial->write(data, length);
       return readString();
     }
+
 };
 
 #endif
