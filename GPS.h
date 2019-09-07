@@ -31,7 +31,7 @@ class GPS {
     }
 
     String write(char* data, uint8_t length) {
-      _serial->write(data, length + 1);
+      _serial->write(data, length);
       return readString();
     }
 };
