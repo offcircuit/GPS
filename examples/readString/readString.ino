@@ -9,16 +9,12 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   gps.begin();
+  Serial.println();
+  Serial.println("---- START OF MESSAGE ----");
+  Serial.println();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.println();
-  Serial.println("---- START OF MESSAGE ----");
-  Serial.println();
   Serial.println(gps.readString());
-  Serial.println();
-  Serial.println("----- END OF MESSAGE -----");
-  Serial.println();
-  delay(100);
 }
