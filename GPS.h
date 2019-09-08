@@ -26,7 +26,9 @@ class GPS {
     }
 
     String readString() {
-      return _serial->readStringUntil(char(0x0D));
+      String data = _serial->readStringUntil(char(0x0D));
+      data.trim();
+      return data;
     }
 
     void write(char* data, uint8_t length) {
