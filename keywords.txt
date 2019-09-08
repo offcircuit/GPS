@@ -16,6 +16,7 @@ begin	KEYWORD2
 checksum	KEYWORD2
 print	KEYWORD2
 readString	KEYWORD2
+write	KEYWORD2
 
 ##################################################
 # Constants				(LITERAL1)
