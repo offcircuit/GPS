@@ -23,7 +23,7 @@ class VKEL: GPS {
       print("PUBX,40,GSA,1,0,0,0,0,0");
       print("PUBX,40,GSV,1,0,0,0,0,0");
       print("PUBX,40,RMC,1,0,0,0,0,0");
-      print("PUBX,40,VTG,1,0,0,0,0,0");
+      print("PUBX,40,VTG,1,0,0,0,0,0"); // TO RESTORE JUST TURN THE GPS POWER OFF
     }
 
     bool read() {
