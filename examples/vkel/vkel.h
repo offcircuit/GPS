@@ -6,7 +6,7 @@
 class VKEL: GPS {
   public:
     uint8_t hour, minute, second, day, month, year;
-    uint16_t dsec;
+    uint16_t csec;
     float latitude, longitude;
     bool NS, WE;
 
@@ -32,7 +32,7 @@ class VKEL: GPS {
       data = readString();
       data.remove(0, data.indexOf(",") + 1);
       data.remove(0, data.indexOf(",") + 1);
-      getTime(data, hour, minute, second, dsec);
+      getTime(data, hour, minute, second, csec);
       getDate(data, day, month, year);
       print("PUBX,00");
       data = readString();
@@ -40,6 +40,7 @@ class VKEL: GPS {
       data.remove(0, data.indexOf(",") + 1);
       data.remove(0, data.indexOf(",") + 1);
       getGeoposition(data, latitude, NS, longitude, WE);
+      Serial.println();
     }
 
   private:
@@ -62,11 +63,11 @@ class VKEL: GPS {
       data.remove(0, data.indexOf(",") + 1);
     }
 
-    void getTime(String &data, uint8_t &hour, uint8_t &minute, uint8_t &second, uint16_t &dsec) {
+    void getTime(String &data, uint8_t &hour, uint8_t &minute, uint8_t &second, uint16_t &csec) {
       hour = data.substring(0, 2).toInt();
       minute = data.substring(2, 4).toInt();
       second = data.substring(4, 6).toInt();
-      dsec = data.substring(7, 9).toInt();
+      csec = data.substring(7, 9).toInt();
       data.remove(0, data.indexOf(",") + 1);
     }
 };
