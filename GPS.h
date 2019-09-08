@@ -1,7 +1,7 @@
 #ifndef GPS_H
 #define GPS_H
 
-#include <SoftwareSerial.h>
+#include "SoftwareSerial.h"
 
 class GPS {
   public:
@@ -26,7 +26,9 @@ class GPS {
     }
 
     String readString() {
-      String data = _serial->readStringUntil(char(0x0D));
+      String data = "";
+      while (_serial->available() && _serial->read() != 0x24);
+      data += _serial->readStringUntil(char(0x0D));
       data.trim();
       return data;
     }
