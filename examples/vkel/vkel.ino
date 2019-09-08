@@ -1,6 +1,6 @@
 #include "VKEL.h"
 
-VKEL gps(2, 3);
+VKEL gps(3, 4);
 
 void setup() {
   // put your setup code here, to run once:
@@ -21,7 +21,7 @@ void loop() {
   Serial.print(":");
   Serial.print(gps.second);
   Serial.print(".");
-  Serial.print(gps.dsec);
+  Serial.print(gps.csec);
   Serial.print(" - ");
   Serial.print(gps.day);
   Serial.print("/");
@@ -34,8 +34,5 @@ void loop() {
   Serial.print("longitude: ");
   Serial.print(gps.longitude, 6);
   Serial.println(gps.WE ? " E" : " W");
-  Serial.println();
-  Serial.println("----- END OF MESSAGE -----");
-  Serial.println();
   delay(500);
 }
