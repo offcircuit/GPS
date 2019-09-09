@@ -29,7 +29,7 @@ class GPS {
       String data;
       while (_serial->available() && (data =_serial->read()) != 0x24);
       data += _serial->readStringUntil(char(0x0D));
-      data = data.substring(data.lastIndexOf(char(0x24)) - 1);
+      data = data.substring(data.lastIndexOf(char(0x24)));
       data.trim();
       return data;
     }
