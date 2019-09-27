@@ -2,7 +2,7 @@
 
 GPS code class for Arduino
 
-# TESTED ON
+## TESTED ON
 
 arduino uno 
 
