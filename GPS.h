@@ -15,11 +15,7 @@ class GPS {
 
     uint32_t begin(uint32_t speed = 0) {
       uint32_t rate = baud();
-      if (speed && (speed != rate)) {
-        if (setBaud(speed)) return speed;
-        else return begin();
-      }
-
+      if (speed && (speed != rate)) return setBaud(speed);
       return rate;
     }
 
@@ -33,6 +29,8 @@ class GPS {
 
     uint32_t setBaud(uint32_t speed) {
       print("PUBX,41,1,0007,0003," + String(speed) + ",0");
+      delay(1000);
+      Serial.println("setting baud ...");
       return baud();
     }
 
@@ -69,8 +67,20 @@ class GPS {
     }
 
     bool protocol() {
-      uint8_t data[4] = {0x0A, 0x04, 0x40, 0x00};
-      write(data, 4);
+      uint8_t data[4] = {0x06, 0x00, 0x00, 0x00};
+      print("PUBX,00");
+      // _serial->println("$PUBX,06,,0*5F");
+      // write(data, 4);
+    }
+
+    String dateTime() {
+      print("PUBX,04");
+      return readINEMA("$PUBX");
+    }
+
+    String getGeoposition() {
+      print("PUBX,00");
+      return readINEMA("$PUBX");
     }
 
 
@@ -81,22 +91,26 @@ class GPS {
     }
 
     void print(String data) {
+      Serial.println("----------------");
+      Serial.println(char(0x24) + data + char(0x2A) + String(checksum(data), HEX));
+      Serial.println("----------------");
       _serial->println(char(0x24) + data + char(0x2A) + String(checksum(data), HEX));
     }
 
-    String readGLL(String INEMA) {
+    String readINEMA(String INEMA) {
       String data;
-      while (String(data = readString()).substring(0, INEMA.length()) != INEMA);
-      return data;
+      uint8_t attempts = 255;
+      while (attempts-- && String(data = readString()).substring(0, INEMA.length()) != INEMA);
+      return attempts ? data : "";
     }
 
     String readString() {
-      /* if (_serial->available()) return String(_serial->read());*/
       String data = "$";
       while (_serial->available() && (_serial->read() != char(0x24)));
       data += _serial->readStringUntil(char(0x0D));
       data = data.substring(data.lastIndexOf(char(0x24)));
       data.trim();
+
       return data;
     }
 
