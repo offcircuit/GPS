@@ -1,0 +1,98 @@
+#include "gps.h"
+
+GPS::GPS(uint8_t rx, uint8_t tx) {
+  _serial = new SoftwareSerial(rx, tx);
+}
+
+uint32_t GPS::begin(uint32_t speed) {
+  _serial->setTimeout(200);
+  uint32_t rate = baud();
+  if (speed && (speed != rate)) return setBaud(speed);
+  return rate;
+}
+
+uint32_t GPS::baud() {
+  const uint16_t map[12] = {768, 384, 192, 96, 48, 32, 16, 8, 4, 2, 1, 0};
+  uint8_t index = 0;
+  do {
+    _serial->begin(map[index] * 1200UL);
+    reset();
+  } while (!_serial->find("$") && (11 > ++index));
+  return map[index] * 1200UL;
+}
+
+uint16_t GPS::checksum(uint8_t *data, uint8_t length) {
+  uint8_t h = 0, l = 0;
+  for (uint8_t i = 0; i < length; i++) l += (h += data[i]);
+  return h << 8 | l;
+}
+
+String GPS::getDateTime() {
+  return print(String(GPS_NEMA_PUBX) + "," + prefix(GPS_PUBX_DATETIME, DEC));
+}
+
+String GPS::getGeoposition() {
+  return print(String(GPS_NEMA_PUBX) + "," + prefix(GPS_PUBX_GEOLOCATION, DEC));
+}
+
+String GPS::getSatellites() {
+  return print(String(GPS_NEMA_PUBX) + "," + prefix(GPS_PUBX_SATELLITES, DEC));
+}
+
+String GPS::prefix(uint8_t data, uint8_t base) {
+  return String(data / base, base) + String(data % base, base);
+}
+
+String GPS::print(String data) {
+  uint8_t n = 0;
+  for (uint8_t i = 0; i < data.length(); i++) n ^= byte(data[i]);
+  _serial->println(char(0x24) + data + char(0x2A) + prefix(n, HEX));
+  do data = readString();
+  while (
+    (String(data.substring(1, String(GPS_NEMA_PUBX).length() + 1)) != GPS_NEMA_PUBX) &&
+    (String(data.substring(1, String(GPS_NEMA_TXT).length() + 1)) != GPS_NEMA_TXT) &&
+    --n);
+  return n ? data : "";
+}
+
+String GPS::readString() {
+  String s = _serial->readStringUntil(char(0x0D));
+  s.trim();
+  return s;
+}
+
+void GPS::reset(uint16_t mode) {
+  uint8_t data[8] = {0x06, 0x04, 0x04, 0x00, mode >> 8, mode & 0xFF, 0x02, 0x00};
+  write(data, 8);
+}
+
+void GPS::send(String data) {
+  uint8_t n = 0;
+  for (uint8_t i = 0; i < data.length(); i++) n ^= byte(data[i]);
+  //Serial.println(char(0x24) + data + char(0x2A) + prefix(n, HEX));
+  _serial->println(String(char(0x24)) + data + String(char(0x2A)) + prefix(n, HEX));
+}
+
+uint32_t GPS::setBaud(uint32_t speed) {
+  //Serial.println("setting baud ...");
+  send(String(GPS_NEMA_PUBX) + ",41,1,0007,0003," + String(speed) + ",0");
+  return baud();
+}
+
+String GPS::version() {
+  uint8_t data[4] = {0x0A, 0x04, 0x00, 0x00};
+  write(data, 4);
+  _serial->find("µb");
+  String s = _serial->readStringUntil(char(0x24));
+  s.remove(s.length() - 2, 2);
+  return s;
+}
+
+void GPS::write(uint8_t *data, uint8_t length) {
+  uint16_t r = checksum(data, length);
+  _serial->write(0xB5);
+  _serial->write(0x62);
+  _serial->write(data, length);
+  _serial->write(r >> 8);
+  _serial->write(r & 0xFF);
+}
