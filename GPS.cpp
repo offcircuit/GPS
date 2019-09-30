@@ -1,4 +1,4 @@
-#include "gps.h"
+#include "GPS.h"
 
 GPS::GPS(uint8_t rx, uint8_t tx) {
   _serial = new SoftwareSerial(rx, tx);
