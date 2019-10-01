@@ -3,10 +3,9 @@
 
 #include <sys/types.h>
 #include <SoftwareSerial.h>
-#include <Arduino.h>
 
-#define GPS_NEMA_PUBX "PUBX"
-#define GPS_NEMA_TXT "GPTXT"
+#define GPS_NEMA_PUBX "PUBX,"
+#define GPS_NEMA_TXT "GPTXT,"
 
 #define GPS_PUBX_GEOLOCATION 0
 #define GPS_PUBX_SATELLITES 3
@@ -18,6 +17,7 @@
 
 class GPS {
   private:
+  public:
     SoftwareSerial *_serial;
     uint32_t baud();
     uint16_t checksum(uint8_t *data, uint8_t length);
@@ -31,7 +31,7 @@ class GPS {
     String getGeoposition();
     String getSatellites();
     String getDateTime();
-    void reset(uint16_t mode = 0);
+    uint8_t reset(uint16_t mode = 0);
     uint32_t setBaud(uint32_t speed);
     String version();
     void write(uint8_t *data, uint8_t length);
