@@ -14,7 +14,7 @@ void setup() {
   Serial.println(gps.getSatellites());
   Serial.println(gps.getDateTime());
   Serial.println(gps.version());
-  Serial.println(gps.reset(0xffff));
+  Serial.println(gps.reset(0x01));
   Serial.println("......");
 }
 

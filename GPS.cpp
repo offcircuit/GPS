@@ -43,6 +43,11 @@ String GPS::print(uint8_t data) {
   if (_serial->find(GPS_PUBX)) return _serial->readStringUntil(char(0x0A));
 }
 
+String GPS::print(String data, char *nema) {
+  send(data);
+  if (_serial->find(nema)) return _serial->readStringUntil(char(0x0A));
+}
+
 String GPS::read() {
   while (!_serial->available());
   String s = _serial->readStringUntil(char(0x0D));

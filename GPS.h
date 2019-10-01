@@ -20,6 +20,7 @@ class GPS {
     SoftwareSerial *_serial;
     uint32_t baud();
     String prefix(uint8_t data, uint8_t base);
+    String print(uint8_t data);
     void send(String data);
     void sendCommand(uint8_t *data, uint8_t length);
 
@@ -29,7 +30,7 @@ class GPS {
     String getDateTime();
     String getGeoposition();
     String getSatellites();
-    String print(uint8_t data);
+    String print(String data, char *nema = GPS_PUBX);
     String read();
     bool reset(uint16_t mode = GPS_HOTSTART);
     uint32_t setBaud(uint32_t speed);
