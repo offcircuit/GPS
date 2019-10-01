@@ -16,12 +16,12 @@
 
 class GPS {
   private:
-    SoftwareSerial *_serial;
     uint32_t baud();
     String prefix(uint8_t data, uint8_t base);
     void send(String data);
 
   public:
+    SoftwareSerial *_serial;
     GPS(uint8_t rx, uint8_t tx);
     uint32_t begin(uint32_t speed = 0);
     String getDateTime();
@@ -32,7 +32,7 @@ class GPS {
     uint32_t setBaud(uint32_t speed);
     String readString();
     String version();
-    void write(uint8_t *data, uint8_t length);
+    String write(uint8_t *data, uint8_t length);
 };
 
 #endif

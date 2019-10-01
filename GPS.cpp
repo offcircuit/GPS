@@ -69,14 +69,12 @@ uint32_t GPS::setBaud(uint32_t speed) {
 
 String GPS::version() {
   uint8_t data[4] = {0x0A, 0x04, 0x00, 0x00};
-  write(data, 4);
-  _serial->findUntil("µb", "\n");
-  String r, s = _serial->readStringUntil(char(0x24));
+  String r, s = write(data, 4);
   for (uint8_t i = 2; i < s.length() - 2; i++) if (s[i] != char(0x00)) r += s[i];
   return r;
 }
 
-void GPS::write(uint8_t *data, uint8_t length) {
+String GPS::write(uint8_t *data, uint8_t length) {
   uint8_t h = 0, l = 0;
   for (uint8_t i = 0; i < length; i++) l += (h += data[i]);
   _serial->write(0xB5);
@@ -84,4 +82,6 @@ void GPS::write(uint8_t *data, uint8_t length) {
   _serial->write(data, length);
   _serial->write(h);
   _serial->write(l);
+  _serial->findUntil("µb", "\n");
+  return  _serial->readStringUntil(char(0x24));
 }
