@@ -83,5 +83,5 @@ String GPS::write(uint8_t *data, uint8_t length) {
   _serial->write(h);
   _serial->write(l);
   _serial->findUntil("µb", "\n");
-  return  _serial->readStringUntil(char(0x24));
+  return _serial->readStringUntil(char(0x24));
 }

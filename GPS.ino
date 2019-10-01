@@ -13,19 +13,10 @@ void setup() {
   Serial.println(gps.getGeoposition());
   Serial.println(gps.getSatellites());
   Serial.println(gps.getDateTime());
-  Serial.println(gps.version());/**/
-  /*
-    String s = gps.info();
-    for (uint8_t i = 0; i < s.length(); i++)
-    {
-      Serial.print(s[i], HEX);
-      Serial.print(" ");
-    }
-  */
-  Serial.println();
+  Serial.println(gps.version());
   Serial.println("......");
 }
 
 void loop() {
-  /* Serial.println(gps.readString()); */
+   Serial.println(gps.readString()); /**/
 }
