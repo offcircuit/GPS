@@ -14,9 +14,10 @@ void setup() {
   Serial.println(gps.getSatellites());
   Serial.println(gps.getDateTime());
   Serial.println(gps.version());
+  Serial.println(gps.reset(0xffff));
   Serial.println("......");
 }
 
 void loop() {
-   Serial.println(gps.readString()); /**/
+  Serial.println(gps.read()); /**/
 }

@@ -4,15 +4,16 @@
 #include <sys/types.h>
 #include <SoftwareSerial.h>
 
-#define GPS_NEMA_PUBX "PUBX,"
-#define GPS_NEMA_TXT "GPTXT,"
+#define GPS_PUBX "PUBX,"
 
-#define GPS_PUBX_GEOLOCATION 0
-#define GPS_PUBX_SATELLITES 3
-#define GPS_PUBX_DATETIME 4
+#define GPS_GEOLOCATION 0
+#define GPS_SATELLITES 3
+#define GPS_DATETIME 4
 
 #define GPS_HOTSTART 0x0000
 #define GPS_WARMSTART 0x0001
+
+#define GPS_PUBXSUM 0x33
 
 class GPS {
   private:
@@ -20,6 +21,7 @@ class GPS {
     uint32_t baud();
     String prefix(uint8_t data, uint8_t base);
     void send(String data);
+    void sendCommand(uint8_t *data, uint8_t length);
 
   public:
     GPS(uint8_t rx, uint8_t tx);
@@ -28,7 +30,7 @@ class GPS {
     String getGeoposition();
     String getSatellites();
     String print(uint8_t data);
-    String readString();
+    String read();
     bool reset(uint16_t mode = GPS_HOTSTART);
     uint32_t setBaud(uint32_t speed);
     String version();
