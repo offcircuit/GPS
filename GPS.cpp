@@ -44,7 +44,7 @@ String GPS::print(uint8_t data) {
 
 String GPS::print(String data, char *nema) {
   send(data);
-  if (nema && _serial->find(nema)) return _serial->readStringUntil(char(0x0A));
+  if (_serial->find(nema)) return _serial->readStringUntil(char(0x0A));
 }
 
 String GPS::read() {
