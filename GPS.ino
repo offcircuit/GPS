@@ -6,7 +6,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   uint32_t rate;
-  while (!(rate = gps.begin(9600)));
+  while (!(rate = gps.begin()));
   Serial.println(rate);
 
   Serial.println("......");

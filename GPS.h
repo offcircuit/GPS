@@ -13,27 +13,25 @@
 
 #define GPS_HOTSTART 0x0000
 #define GPS_WARMSTART 0x0001
-#define GPS_COLDSTART 0xffff
 
 class GPS {
   private:
     SoftwareSerial *_serial;
     uint32_t baud();
-    uint16_t checksum(uint8_t *data, uint8_t length);
     String prefix(uint8_t data, uint8_t base);
     void send(String data);
 
   public:
     GPS(uint8_t rx, uint8_t tx);
     uint32_t begin(uint32_t speed = 0);
+    String getDateTime();
     String getGeoposition();
     String getSatellites();
-    String getDateTime();
-    String print(String data);
-    uint8_t reset(uint16_t mode = 0);
+    String print(uint8_t data);
+    bool reset(uint16_t mode = GPS_HOTSTART);
     uint32_t setBaud(uint32_t speed);
-    String version();
     String readString();
+    String version();
     void write(uint8_t *data, uint8_t length);
 };
 

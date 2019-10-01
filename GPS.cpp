@@ -22,30 +22,24 @@ uint32_t GPS::baud() {
   return map[index] * 1200UL;
 }
 
-uint16_t GPS::checksum(uint8_t *data, uint8_t length) {
-  uint8_t h = 0, l = 0;
-  for (uint8_t i = 0; i < length; i++) l += (h += data[i]);
-  return h << 8 | l;
-}
-
 String GPS::getDateTime() {
-  return print(String(GPS_NEMA_PUBX) + prefix(GPS_PUBX_DATETIME, DEC));
+  return print(GPS_PUBX_DATETIME);
 }
 
 String GPS::getGeoposition() {
-  return print(String(GPS_NEMA_PUBX) + prefix(GPS_PUBX_GEOLOCATION, DEC));
+  return print(GPS_PUBX_GEOLOCATION);
 }
 
 String GPS::getSatellites() {
-  return print(String(GPS_NEMA_PUBX) + prefix(GPS_PUBX_SATELLITES, DEC));
+  return print(GPS_PUBX_SATELLITES);
 }
 
 String GPS::prefix(uint8_t data, uint8_t base) {
   return String(data / base, base) + String(data % base, base);
 }
 
-String GPS::print(String data) {
-  send(data);
+String GPS::print(uint8_t data) {
+  send(String(GPS_NEMA_PUBX) + prefix(data, DEC));
   if (_serial->find(GPS_NEMA_PUBX)) return _serial->readStringUntil(char(0x0A));
 }
 
@@ -56,7 +50,7 @@ String GPS::readString() {
   return s;
 }
 
-uint8_t GPS::reset(uint16_t mode) {
+bool GPS::reset(uint16_t mode) {
   uint8_t data[8] = {0x06, 0x04, 0x04, 0x00, mode >> 8, mode & 0xFF, 0x02, 0x00};
   write(data, 8);
   return _serial->find(GPS_NEMA_TXT);
@@ -75,7 +69,6 @@ uint32_t GPS::setBaud(uint32_t speed) {
 
 String GPS::version() {
   uint8_t data[4] = {0x0A, 0x04, 0x00, 0x00};
-  char e[2] = {0x0A, 0x04};
   write(data, 4);
   _serial->findUntil("µb", "\n");
   String r, s = _serial->readStringUntil(char(0x24));
@@ -84,10 +77,11 @@ String GPS::version() {
 }
 
 void GPS::write(uint8_t *data, uint8_t length) {
-  uint16_t r = checksum(data, length);
+  uint8_t h = 0, l = 0;
+  for (uint8_t i = 0; i < length; i++) l += (h += data[i]);
   _serial->write(0xB5);
   _serial->write(0x62);
   _serial->write(data, length);
-  _serial->write(r >> 8);
-  _serial->write(r & 0xFF);
+  _serial->write(h);
+  _serial->write(l);
 }
