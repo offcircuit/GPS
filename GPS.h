@@ -5,6 +5,7 @@
 #include <SoftwareSerial.h>
 
 #define GPS_PUBX "PUBX,"
+#define GPS_GPTXT "GPTXT,"
 
 #define GPS_GEOLOCATION 0
 #define GPS_SATELLITES 3
@@ -30,7 +31,7 @@ class GPS {
     String getDateTime();
     String getGeoposition();
     String getSatellites();
-    String print(String data, char *nema = GPS_PUBX);
+    String print(String data, char *nema = GPS_GPTXT);
     String read();
     bool reset(uint16_t mode = GPS_HOTSTART);
     uint32_t setBaud(uint32_t speed);

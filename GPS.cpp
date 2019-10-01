@@ -17,7 +17,7 @@ uint32_t GPS::baud() {
   do {
     _serial->begin(map[index] * 1200UL);
     send(String(GPS_PUBX));
-  } while (!_serial->find("GPTXT,01,01,") && (11 > ++index));
+  } while (!_serial->find(GPS_GPTXT) && (11 > ++index));
   _serial->setTimeout(1000);
   return map[index] * 1200UL;
 }
@@ -39,7 +39,7 @@ String GPS::prefix(uint8_t data, uint8_t base) {
 }
 
 String GPS::print(uint8_t data) {
-  return print(String(GPS_PUBX) + prefix(data, DEC));
+  return print(String(GPS_PUBX) + prefix(data, DEC), GPS_PUBX);
 }
 
 String GPS::print(String data, char *nema) {
@@ -54,7 +54,7 @@ String GPS::read() {
 bool GPS::reset(uint16_t mode) {
   uint8_t data[8] = {0x06, 0x04, 0x04, 0x00, mode >> 8, mode & 0xFF, 0x02, 0x00};
   sendCommand(data, 8);
-  if (_serial->find("GPTXT,01,01,02,")) {
+  if (_serial->find(strcat(GPS_GPTXT, "01,01,02,"))) {
     _serial->findUntil("µb", "\n");
     _serial->readStringUntil(char(0x0A));
     return true;
