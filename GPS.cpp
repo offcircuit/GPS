@@ -49,16 +49,17 @@ String GPS::print(String data, char *nema) {
 }
 
 String GPS::read() {
-  while (!_serial->available());
-  String s = _serial->readStringUntil(char(0x0D));
-  s.trim();
-  return s;
+  return _serial->readStringUntil(char(0x0A));
 }
 
 bool GPS::reset(uint16_t mode) {
   uint8_t data[8] = {0x06, 0x04, 0x04, 0x00, mode >> 8, mode & 0xFF, 0x02, 0x00};
   sendCommand(data, 8);
-  return _serial->find("GPTXT,01,01,02,");
+  if (_serial->find("GPTXT,01,01,02,")) {
+    _serial->findUntil("µb", "\n");
+    _serial->readStringUntil(char(0x0A));
+    return true;
+  }
 }
 
 void GPS::send(String data) {
