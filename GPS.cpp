@@ -39,13 +39,12 @@ String GPS::prefix(uint8_t data, uint8_t base) {
 }
 
 String GPS::print(uint8_t data) {
-  send(String(GPS_PUBX) + prefix(data, DEC));
-  if (_serial->find(GPS_PUBX)) return _serial->readStringUntil(char(0x0A));
+  return print(String(GPS_PUBX) + prefix(data, DEC));
 }
 
 String GPS::print(String data, char *nema) {
   send(data);
-  if (_serial->find(nema)) return _serial->readStringUntil(char(0x0A));
+  if (nema && _serial->find(nema)) return _serial->readStringUntil(char(0x0A));
 }
 
 String GPS::read() {

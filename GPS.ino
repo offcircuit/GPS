@@ -6,7 +6,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   uint32_t rate;
-  while (!(rate = gps.begin()));
+  while (!(rate = gps.begin(19200)));
   Serial.println(rate);
 
   Serial.println("......");
@@ -19,5 +19,6 @@ void setup() {
 }
 
 void loop() {
-  Serial.println(gps.read()); /**/
+  /*Serial.println(gps.read()); */
+  Serial.println(gps.getGeoposition());
 }
