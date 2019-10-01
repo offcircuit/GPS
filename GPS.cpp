@@ -18,6 +18,7 @@ uint32_t GPS::baud() {
     _serial->begin(map[index] * 1200UL);
     send(String(GPS_PUBX));
   } while (!_serial->find(GPS_GPTXT) && (11 > ++index));
+  _serial->readStringUntil(char(0x0A));
   _serial->setTimeout(1000);
   return map[index] * 1200UL;
 }
