@@ -69,19 +69,18 @@ void GPS::send(String data) {
 }
 
 uint32_t GPS::setBaud(uint32_t speed) {
-  Serial.println("set baud ......");
   send(String(GPS_NEMA_PUBX) + "41,1,0007,0003," + String(speed) + ",0");
   return baud();
 }
 
 String GPS::version() {
   uint8_t data[4] = {0x0A, 0x04, 0x00, 0x00};
-  char e[2] = {0x0a, 0x04};
+  char e[2] = {0x0A, 0x04};
   write(data, 4);
-  _serial->findUntil(e, "\n");
-  String s = _serial->readStringUntil(char(0x24));
-  s.remove(s.length() - 2, 2);
-  return s;
+  _serial->findUntil("µb", "\n");
+  String r, s = _serial->readStringUntil(char(0x24));
+  for (uint8_t i = 2; i < s.length() - 2; i++) if (s[i] != char(0x00)) r += s[i];
+  return r;
 }
 
 void GPS::write(uint8_t *data, uint8_t length) {

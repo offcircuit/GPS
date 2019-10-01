@@ -17,13 +17,11 @@
 
 class GPS {
   private:
-  public:
     SoftwareSerial *_serial;
     uint32_t baud();
     uint16_t checksum(uint8_t *data, uint8_t length);
     String prefix(uint8_t data, uint8_t base);
-    String print(String data);
-    String readString();
+    void send(String data);
 
   public:
     GPS(uint8_t rx, uint8_t tx);
@@ -31,20 +29,12 @@ class GPS {
     String getGeoposition();
     String getSatellites();
     String getDateTime();
+    String print(String data);
     uint8_t reset(uint16_t mode = 0);
     uint32_t setBaud(uint32_t speed);
     String version();
+    String readString();
     void write(uint8_t *data, uint8_t length);
-
-    void send(String data);
-
-    String info() {
-      uint8_t data[5] = {0x06, 0x00, 0x01, 0x00, 0x01};
-      write(data, 5);
-      _serial->find("µb");
-      return  _serial->readStringUntil(char(0x24));
-    }
-
 };
 
 #endif
