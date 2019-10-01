@@ -18,14 +18,14 @@
 
 class GPS {
   private:
-    SoftwareSerial *_serial;
+   public:
+   SoftwareSerial *_serial;
     uint32_t baud();
     String prefix(uint8_t data, uint8_t base);
     String print(uint8_t data);
     void send(String data);
     void sendCommand(uint8_t *data, uint8_t length);
 
-  public:
     GPS(uint8_t rx, uint8_t tx);
     uint32_t begin(uint32_t speed = 0);
     String getDateTime();
