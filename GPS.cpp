@@ -63,7 +63,7 @@ bool GPS::reset(uint16_t mode) {
 
 void GPS::send(String data) {
   uint8_t n = 0;
-  for (uint8_t i = 0; i < data.length(); i++) n ^= byte(data[i]);
+  for (uint8_t i = 0; i < data.length(); i++) n ^= uint8_t(data[i]);
   _serial->println(String(char(0x24)) + data + String(char(0x2A)) + prefix(n, HEX));
 }
 
