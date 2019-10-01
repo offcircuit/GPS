@@ -14,11 +14,11 @@ uint32_t GPS::baud() {
   const uint16_t map[12] = {768, 384, 192, 96, 48, 32, 16, 8, 4, 2, 1, 0};
   uint8_t index = 0;
   _serial->setTimeout(100);
-  do _serial->begin(map[index] * 1200UL);
-  while (!reset() && (11 > ++index));
+  do {
+    _serial->begin(map[index] * 1200UL);
+    send(String(GPS_NEMA_PUBX));
+  } while (!_serial->find(GPS_NEMA_TXT) && (11 > ++index));
   _serial->setTimeout(1000);
-  _serial->find(GPS_NEMA_TXT);
-  _serial->find(GPS_NEMA_TXT);
   return map[index] * 1200UL;
 }
 
@@ -45,11 +45,8 @@ String GPS::prefix(uint8_t data, uint8_t base) {
 }
 
 String GPS::print(String data) {
-  uint8_t n = 0;
-  for (uint8_t i = 0; i < data.length(); i++) n ^= byte(data[i]);
-  _serial->println(char(0x24) + data + char(0x2A) + prefix(n, HEX));
-  _serial->find(GPS_NEMA_PUBX);
-  return _serial->readStringUntil(char(0x0D));
+  send(data);
+  if (_serial->find(GPS_NEMA_PUBX)) return _serial->readStringUntil(char(0x0A));
 }
 
 String GPS::readString() {
@@ -72,16 +69,16 @@ void GPS::send(String data) {
 }
 
 uint32_t GPS::setBaud(uint32_t speed) {
-  send(String(GPS_NEMA_PUBX) + ",41,1,0007,0003," + String(speed) + ",0");
-  reset();
-  delay(3000);
+  Serial.println("set baud ......");
+  send(String(GPS_NEMA_PUBX) + "41,1,0007,0003," + String(speed) + ",0");
   return baud();
 }
 
 String GPS::version() {
   uint8_t data[4] = {0x0A, 0x04, 0x00, 0x00};
+  char e[2] = {0x0a, 0x04};
   write(data, 4);
-  _serial->find("µb");
+  _serial->findUntil(e, "\n");
   String s = _serial->readStringUntil(char(0x24));
   s.remove(s.length() - 2, 2);
   return s;

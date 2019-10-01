@@ -37,6 +37,14 @@ class GPS {
     void write(uint8_t *data, uint8_t length);
 
     void send(String data);
+
+    String info() {
+      uint8_t data[5] = {0x06, 0x00, 0x01, 0x00, 0x01};
+      write(data, 5);
+      _serial->find("µb");
+      return  _serial->readStringUntil(char(0x24));
+    }
+
 };
 
 #endif
