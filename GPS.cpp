@@ -85,11 +85,8 @@ uint32_t GPS::setBaud(uint32_t speed) {
 String GPS::version() {
   uint8_t data[4] = {0x0A, 0x04, 0x00, 0x00};
   String s = write(data, 4);
-  for (uint8_t i = 0; i < s.length(); i++)
-    if (s.charAt(i) < char(0x20)) s.setCharAt(i, char(0x20));
-  s.remove(0, 2);
-  s.remove(s.length() - 2, 2);
-  return s;
+  for (uint8_t i = 0; i < s.length(); i++) if (s.charAt(i) < char(0x20)) s.setCharAt(i, char(0x20));
+  return s.substring(2, s.length() - 2);
 }
 
 String GPS::write(uint8_t *data, uint8_t length) {
