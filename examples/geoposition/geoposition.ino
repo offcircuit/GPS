@@ -5,8 +5,7 @@ GPS gps(4, 5);
 void setup() {
   Serial.begin(115200);
   Serial.println();
-  uint32_t rate;
-  while (!(rate = gps.begin()));
+  while (!gps.begin());
   Serial.println("...DateTime...");
   Serial.println();
   Serial.println(gps.getDateTime());
