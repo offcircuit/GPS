@@ -90,7 +90,7 @@ String GPS::version() {
 
 void GPS::write(uint8_t *buffer, size_t length) {
   uint8_t h = 0, l = 0;
-  for (uint8_t i = 2; i < length; i++) l += (h += buffer[i]);
+  for (size_t i = 2; i < length; i++) l += (h += buffer[i]);
   _serial->write(buffer, length);
   _serial->write(h);
   _serial->write(l);
