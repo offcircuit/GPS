@@ -33,8 +33,8 @@ String GPS::find(char *buffer) {
         c = _serial->read();
         data += char(c);
       } while (c != 0x2A);
-    while (_serial->available() < 2);
     c = data.length();
+    while (_serial->available() < 2);
     data += char(_serial->read());
     data += char(_serial->read());
     if (prefix(n, HEX).equalsIgnoreCase(data.substring(c, c + 2))) return data;
