@@ -23,13 +23,12 @@ uint32_t GPS::baud() {
   return map[index] * 1200UL;
 }
 
-
 String GPS::find(char *buffer) {
   if (_serial->find(buffer)) {
     uint8_t n = 0;
     String data = String(buffer) + _serial->readStringUntil(char(0x0A));
-    for (uint8_t i = data.indexOf("$") + 1; i < data.lastIndexOf("*"); i++) n ^= uint8_t(data[i]);
-    uint8_t i = data.lastIndexOf("*") + 1;
+    for (uint8_t i = data.indexOf(char(0x24)) + 1; i < data.lastIndexOf(char(0x2A)); i++) n ^= uint8_t(data[i]);
+    uint8_t i = data.lastIndexOf(char(0x2A)) + 1;
     if (prefix(n, HEX).equalsIgnoreCase(data.substring(i, i + 2))) return data;
   }
   return "";
@@ -62,13 +61,13 @@ void GPS::print(String data) {
 
 String GPS::readString() {
   String data;
-  do data = find(char(0x24)); while (!data.length());
+  do data = find("$"); while (!data.length());
   return data;
 }
 
 bool GPS::reset(uint16_t mode) {
-  uint8_t data[8] = {0x06, 0x04, 0x04, 0x00, mode >> 8, mode & 0xFF, 0x02, 0x00};
-  write(data, 8);
+  uint8_t data[10] = {0xB5, 0x62, 0x06, 0x04, 0x04, 0x00, mode >> 8, mode & 0xFF, 0x02, 0x00};
+  write(data, 10);
   if (_serial->find(strcat(GPS_GPTXT, "01,01,02,"))) return read();
 }
 
@@ -78,17 +77,15 @@ uint32_t GPS::setBaud(uint32_t speed) {
 }
 
 String GPS::version() {
-  uint8_t data[4] = {0x0A, 0x04, 0x00, 0x00};
-  write(data, 4);
+  uint8_t data[6] = {0xB5, 0x62, 0x0A, 0x04, 0x00, 0x00};
+  write(data, 6);
   return read();
 }
 
 void GPS::write(uint8_t *buffer, size_t length) {
-  uint8_t h = 0, l = 0;
-  for (uint8_t i = 0; i < length; i++) l += (h += buffer[i]);
-  _serial->write(0xB5);
-  _serial->write(0x62);
   _serial->write(buffer, length);
+  uint8_t h = 0, l = 0;
+  for (uint8_t i = 2; i < length; i++) l += (h += buffer[i]);
   _serial->write(h);
   _serial->write(l);
 }
