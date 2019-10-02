@@ -3,6 +3,8 @@
 
 #include <sys/types.h>
 #include <SoftwareSerial.h>
+#include <Arduino.h>
+
 
 #define GPS_PUBX "PUBX,"
 #define GPS_GPTXT "GPTXT,"
