@@ -18,24 +18,29 @@ uint32_t GPS::baud() {
     _serial->begin(map[index] * 1200UL);
     print(String(GPS_PUBX));
   }
-  while (!readString(GPS_GPTXT).length() && (11 > ++index));
+  while (!find(GPS_GPTXT).length() && (11 > ++index));
   _serial->setTimeout(1000);
   return map[index] * 1200UL;
 }
 
+String GPS::find(char *data) {
+  if (_serial->find(data)) return _serial->readStringUntil(char(0x0A));
+  return "";
+}
+
 String GPS::getDateTime() {
   print(String(GPS_PUBX) + prefix(GPS_DATETIME, DEC));
-  return readString(GPS_PUBX);
+  return find(GPS_PUBX);
 }
 
 String GPS::getGeoposition() {
   print(String(GPS_PUBX) + prefix(GPS_GEOLOCATION, DEC));
-  return readString(GPS_PUBX);
+  return find(GPS_PUBX);
 }
 
 String GPS::getSatellites() {
   print(String(GPS_PUBX) + prefix(GPS_SATELLITES, DEC));
-  return readString(GPS_PUBX);
+  return find(GPS_PUBX);
 }
 
 String GPS::prefix(uint8_t data, uint8_t base) {
@@ -50,11 +55,6 @@ void GPS::print(String data) {
 
 String GPS::readString() {
   return _serial->readStringUntil(char(0x0A));
-}
-
-String GPS::readString(char *data) {
-  if (_serial->find(data)) return _serial->readStringUntil(char(0x0A));
-  return "";
 }
 
 bool GPS::reset(uint16_t mode) {

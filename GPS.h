@@ -3,8 +3,6 @@
 
 #include <sys/types.h>
 #include <SoftwareSerial.h>
-#include <Arduino.h>
-
 
 #define GPS_PUBX "PUBX,"
 #define GPS_GPTXT "GPTXT,"
@@ -27,13 +25,13 @@ class GPS {
   public:
     GPS(uint8_t rx, uint8_t tx);
     uint32_t begin(uint32_t speed = 0);
+    String find(char *data);
     String getDateTime();
     String getGeoposition();
     String getSatellites();
     void print(String data);
     String read();
     String readString();
-    String readString(char *nema);
     bool reset(uint16_t mode = GPS_HOTSTART);
     uint32_t setBaud(uint32_t speed);
     String version();
