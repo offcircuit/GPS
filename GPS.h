@@ -23,7 +23,7 @@ class GPS {
   public:
     GPS(uint8_t rx, uint8_t tx);
     uint32_t begin(uint32_t speed = 0);
-    String find(char *buffer);
+    String find(char *buffer, bool checksum = false);
     String getDateTime();
     String getGeoposition();
     String getSatellites();

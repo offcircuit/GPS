@@ -23,13 +23,17 @@ uint32_t GPS::baud() {
   return map[index] * 1200UL;
 }
 
-String GPS::find(char *buffer) {
+String GPS::find(char *buffer, bool checksum) {
   if (_serial->find(buffer)) {
-    uint8_t n = 0;
-    String data = String(buffer) + _serial->readStringUntil(char(0x0A));
-    for (uint8_t i = data.indexOf(char(0x24)) + 1; i < data.lastIndexOf(char(0x2A)); i++) n ^= uint8_t(data[i]);
-    uint8_t i = data.lastIndexOf(char(0x2A)) + 1;
-    if (prefix(n, HEX).equalsIgnoreCase(data.substring(i, i + 2))) return data;
+    uint8_t n = 0, c = 0;
+    String data = String(buffer);
+    for (uint8_t i = String(buffer).indexOf(char(0x24)) + 1; i < String(buffer).length(); i++) n ^= uint8_t(data[i]);
+    do if (_serial->available()) {
+        n ^= c;
+        c = _serial->read();
+        data += char(c);
+      } while (c != 0x2A);
+    if (n = (uint8_t(_serial->read()) << 8 | uint8_t(_serial->read()))) return data + prefix(n, HEX);
   }
   return "";
 }
@@ -81,9 +85,9 @@ String GPS::version() {
 }
 
 void GPS::write(uint8_t *buffer, size_t length) {
-  _serial->write(buffer, length);
   uint8_t h = 0, l = 0;
   for (uint8_t i = 2; i < length; i++) l += (h += buffer[i]);
+  _serial->write(buffer, length);
   _serial->write(h);
   _serial->write(l);
 }
