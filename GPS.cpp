@@ -23,13 +23,14 @@ uint32_t GPS::baud() {
   return map[index] * 1200UL;
 }
 
+
 String GPS::find(char *buffer) {
   if (_serial->find(buffer)) {
-    String data = _serial->readStringUntil(char(0x0A));
-
-
-
-    return data;
+    uint8_t n = 0;
+    String data = String(buffer) + _serial->readStringUntil(char(0x0A));
+    for (uint8_t i = data.indexOf("$") + 1; i < data.lastIndexOf("*"); i++) n ^= uint8_t(data[i]);
+    uint8_t i = data.lastIndexOf("*") + 1;
+    if (prefix(n, HEX).equalsIgnoreCase(data.substring(i, i + 2))) return data;
   }
   return "";
 }
@@ -55,7 +56,7 @@ String GPS::prefix(uint8_t data, uint8_t base) {
 
 void GPS::print(String data) {
   uint8_t n = 0;
-  for (uint8_t i = 0; i < data.length(); i++) n ^= uint8_t(data[i]);
+  for (uint8_t i = 1; i < data.length(); i++) n ^= uint8_t(data[i]);
   _serial->println(String(char(0x24)) + data + String(char(0x2A)) + prefix(n, HEX));
 }
 

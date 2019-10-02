@@ -4,8 +4,8 @@
 #include <sys/types.h>
 #include <SoftwareSerial.h>
 
-#define GPS_PUBX "PUBX,"
-#define GPS_GPTXT "GPTXT,"
+#define GPS_PUBX "$PUBX,"
+#define GPS_GPTXT "$GPTXT,"
 
 #define GPS_GEOLOCATION 0
 #define GPS_SATELLITES 3
