@@ -36,7 +36,7 @@ class GPS {
     bool reset(uint16_t mode = GPS_HOTSTART);
     uint32_t setBaud(uint32_t speed);
     String version();
-    String write(uint8_t *data, uint8_t length);
+    String write(uint8_t *data, uint16_t length);
 };
 
 #endif
