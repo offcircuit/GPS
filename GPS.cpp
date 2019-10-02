@@ -57,7 +57,7 @@ void GPS::print(String data) {
 }
 
 String GPS::readString() {
-  return _serial->readStringUntil(char(0x0A));
+  return find(char(0x24));
 }
 
 bool GPS::reset(uint16_t mode) {
