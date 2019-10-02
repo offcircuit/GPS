@@ -60,7 +60,8 @@ void GPS::print(String data) {
 }
 
 String GPS::readString() {
-  String data;
+   return find("$");
+ String data;
   do data = find("$"); while (!data.length());
   return data;
 }
