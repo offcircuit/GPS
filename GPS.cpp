@@ -95,6 +95,6 @@ String GPS::write(uint8_t *data, uint16_t length) {
   _serial->findUntil("µb", char(0x0A));
   String s;
   do if (_serial->available()) s += char(_serial->read());
-  while (_serial->peek() != char(0x24) || s.length() < (s[2] | s[3] >> 8));
+  while (_serial->peek() != char(0x24) || s.length() < (8 | s[2] | s[3] >> 8));
   return s;
 }
