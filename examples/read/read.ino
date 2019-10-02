@@ -15,5 +15,5 @@ void setup() {
 }
 
 void loop() {
-  Serial.println(gps.read());
+  Serial.println(gps.readString());
 }
