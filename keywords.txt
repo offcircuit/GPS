@@ -12,6 +12,7 @@ GPS	KEYWORD1
 # Methods and Functions			(KEYWORD2)
 ##################################################
 begin	KEYWORD2
+find  KEYWORD2
 getDateTime	KEYWORD2
 getGeoposition	KEYWORD2
 getSatellites	KEYWORD2
