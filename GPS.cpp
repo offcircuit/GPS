@@ -87,11 +87,32 @@ String GPS::version() {
   uint8_t data[4] = {0x0A, 0x04, 0x00, 0x00};
   String s = write(data, 4);
   for (uint8_t i = 0; i < s.length(); i++) if (s.charAt(i) < char(0x20)) s.setCharAt(i, char(0x20));
-  return s.substring(2, s.length() - 2);
+  return s;
 }
 
 String GPS::write(uint8_t *data, uint16_t length) {
+  uint8_t h, l;
+  String s;
   sendCommand(data, length);
-  _serial->findUntil("µb", "\n");
-  return _serial->readStringUntil(char(0x24));
+  _serial->findUntil("µ", "b");
+  while (_serial->available() < 4);
+
+  l += (h += _serial->read());
+  l += (h += _serial->read());
+
+  length = _serial->read() | _serial->read() << 8;
+  l += (h += length & 0xFF);
+  l += (h += length >> 8);
+
+  do {
+    if (_serial->available()) {
+      uint8_t c = _serial->read();
+      s += char(c);
+      l += (h += c);
+      length--;
+    }
+  } while (length);
+  while (_serial->available() < 2);
+
+  if (uint8_t(_serial->read()) == h && uint8_t(_serial->read()) == l) return s;
 }
