@@ -57,7 +57,7 @@ String GPS::getSatellites() {
   return find(GPS_PUBX);
 }
 
-String GPS::prefix(uint8_t val, int base) {
+String GPS::prefix(uint8_t val, uint8_t base) {
   return String(val / base, base) + String(val % base, base);
 }
 

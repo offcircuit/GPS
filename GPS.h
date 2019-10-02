@@ -18,7 +18,7 @@ class GPS {
   private:
     SoftwareSerial *_serial;
     uint32_t baud();
-    String prefix(uint8_t val, int base);
+    String prefix(uint8_t val, uint8_t base);
 
   public:
     GPS(uint8_t rx, uint8_t tx);
