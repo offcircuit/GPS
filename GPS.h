@@ -20,22 +20,20 @@
 
 class GPS {
   private:
-   public:
-   SoftwareSerial *_serial;
+    SoftwareSerial *_serial;
     uint32_t baud();
     String prefix(uint8_t data, uint8_t base);
-    String print(uint8_t data);
-    void send(String data);
-    void sendCommand(uint8_t *data, size_t length);
 
+  public:
     GPS(uint8_t rx, uint8_t tx);
     uint32_t begin(uint32_t speed = 0);
     String getDateTime();
     String getGeoposition();
     String getSatellites();
-    String print(String data, char *nema = GPS_GPTXT);
+    void print(String data);
     String read();
     String readString();
+    String readString(char *nema);
     bool reset(uint16_t mode = GPS_HOTSTART);
     uint32_t setBaud(uint32_t speed);
     String version();
