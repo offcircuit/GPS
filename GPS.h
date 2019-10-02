@@ -18,12 +18,12 @@ class GPS {
   private:
     SoftwareSerial *_serial;
     uint32_t baud();
-    String prefix(uint8_t data, uint8_t base);
+    String prefix(uint8_t val, int base);
 
   public:
     GPS(uint8_t rx, uint8_t tx);
     uint32_t begin(uint32_t speed = 0);
-    String find(char *buffer, bool checksum = false);
+    String find(char *buffer);
     String getDateTime();
     String getGeoposition();
     String getSatellites();

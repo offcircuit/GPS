@@ -23,17 +23,21 @@ uint32_t GPS::baud() {
   return map[index] * 1200UL;
 }
 
-String GPS::find(char *buffer, bool checksum) {
+String GPS::find(char *buffer) {
   if (_serial->find(buffer)) {
-    uint8_t n = 0, c = 0;
     String data = String(buffer);
-    for (uint8_t i = String(buffer).indexOf(char(0x24)) + 1; i < String(buffer).length(); i++) n ^= uint8_t(data[i]);
+    uint8_t c = 0, n = 0;
+    for (uint8_t i = data.indexOf(char(0x24)) + 1; i < data.length(); i++) n ^= uint8_t(data[i]);
     do if (_serial->available()) {
         n ^= c;
         c = _serial->read();
         data += char(c);
       } while (c != 0x2A);
-    if (n = (uint8_t(_serial->read()) << 8 | uint8_t(_serial->read()))) return data + prefix(n, HEX);
+    while (_serial->available() < 2);
+    data += char(_serial->read());
+    data += char(_serial->read());
+    c = data.lastIndexOf(char(0x2A)) + 1;
+    if (prefix(n, HEX).equalsIgnoreCase(data.substring(c, c + 2))) return data;
   }
   return "";
 }
@@ -53,8 +57,8 @@ String GPS::getSatellites() {
   return find(GPS_PUBX);
 }
 
-String GPS::prefix(uint8_t data, uint8_t base) {
-  return String(data / base, base) + String(data % base, base);
+String GPS::prefix(uint8_t val, int base) {
+  return String(val / base, base) + String(val % base, base);
 }
 
 void GPS::print(String data) {
