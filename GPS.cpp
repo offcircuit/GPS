@@ -26,6 +26,9 @@ uint32_t GPS::baud() {
 String GPS::find(char *buffer) {
   if (_serial->find(buffer)) {
     String data = _serial->readStringUntil(char(0x0A));
+
+
+
     return data;
   }
   return "";
@@ -57,7 +60,9 @@ void GPS::print(String data) {
 }
 
 String GPS::readString() {
-  return find(char(0x24));
+  String data;
+  do data = find(char(0x24)); while (!data.length());
+  return data;
 }
 
 bool GPS::reset(uint16_t mode) {
