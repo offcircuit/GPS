@@ -48,18 +48,14 @@ String GPS::print(String data, char *nema) {
   if (_serial->find(nema)) return _serial->readStringUntil(char(0x0A));
 }
 
-String GPS::read() {
+String GPS::readString() {
   return _serial->readStringUntil(char(0x0A));
 }
 
 bool GPS::reset(uint16_t mode) {
   uint8_t data[8] = {0x06, 0x04, 0x04, 0x00, mode >> 8, mode & 0xFF, 0x02, 0x00};
   sendCommand(data, 8);
-  if (_serial->find(strcat(GPS_GPTXT, "01,01,02,"))) {
-    _serial->findUntil("µb", "\n");
-    _serial->readStringUntil(char(0x0A));
-    return true;
-  }
+  if (_serial->find(strcat(GPS_GPTXT, "01,01,02,"))) return read(); 
 }
 
 void GPS::send(String data) {
@@ -68,7 +64,7 @@ void GPS::send(String data) {
   _serial->println(String(char(0x24)) + data + String(char(0x2A)) + prefix(n, HEX));
 }
 
-void GPS::sendCommand(uint8_t *data, uint8_t length) {
+void GPS::sendCommand(uint8_t *data, size_t length) {
   uint8_t h = 0, l = 0;
   for (uint8_t i = 0; i < length; i++) l += (h += data[i]);
   _serial->write(0xB5);
@@ -85,34 +81,34 @@ uint32_t GPS::setBaud(uint32_t speed) {
 
 String GPS::version() {
   uint8_t data[4] = {0x0A, 0x04, 0x00, 0x00};
-  String s = write(data, 4);
-  for (uint8_t i = 0; i < s.length(); i++) if (s.charAt(i) < char(0x20)) s.setCharAt(i, char(0x20));
-  return s;
+  write(data, 4);
+  return read();
 }
 
-String GPS::write(uint8_t *data, uint16_t length) {
-  uint8_t h, l;
-  String s;
+void GPS::write(uint8_t *data, size_t length) {
   sendCommand(data, length);
+}
+
+String GPS::read() {
+  String s;
+  uint8_t h, l;
+  uint16_t length;
   _serial->findUntil("µ", "b");
+
   while (_serial->available() < 4);
-
   l += (h += _serial->read());
   l += (h += _serial->read());
-
   length = _serial->read() | _serial->read() << 8;
   l += (h += length & 0xFF);
   l += (h += length >> 8);
 
-  do {
-    if (_serial->available()) {
+  do if (_serial->available()) {
       uint8_t c = _serial->read();
       s += char(c);
       l += (h += c);
       length--;
-    }
-  } while (length);
+    } while (length);
+    
   while (_serial->available() < 2);
-
   if (uint8_t(_serial->read()) == h && uint8_t(_serial->read()) == l) return s;
 }
