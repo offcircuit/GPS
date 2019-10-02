@@ -17,6 +17,7 @@ getGeoposition	KEYWORD2
 getSatellites	KEYWORD2
 print	KEYWORD2
 read	KEYWORD2
+readString	KEYWORD2
 reset	KEYWORD2
 setBaud	KEYWORD2
 version	KEYWORD2
