@@ -23,8 +23,11 @@ uint32_t GPS::baud() {
   return map[index] * 1200UL;
 }
 
-String GPS::find(char *data) {
-  if (_serial->find(data)) return _serial->readStringUntil(char(0x0A));
+String GPS::find(char *buffer) {
+  if (_serial->find(buffer)) {
+    String data = _serial->readStringUntil(char(0x0A));
+    return data;
+  }
   return "";
 }
 
@@ -74,19 +77,19 @@ String GPS::version() {
   return read();
 }
 
-void GPS::write(uint8_t *data, size_t length) {
+void GPS::write(uint8_t *buffer, size_t length) {
   uint8_t h = 0, l = 0;
-  for (uint8_t i = 0; i < length; i++) l += (h += data[i]);
+  for (uint8_t i = 0; i < length; i++) l += (h += buffer[i]);
   _serial->write(0xB5);
   _serial->write(0x62);
-  _serial->write(data, length);
+  _serial->write(buffer, length);
   _serial->write(h);
   _serial->write(l);
 }
 
 String GPS::read() {
-  String s;
-  uint8_t h, l;
+  String data;
+  uint8_t h = 0, l = 0;
   uint16_t length;
   _serial->findUntil("µ", "b");
 
@@ -99,11 +102,11 @@ String GPS::read() {
 
   do if (_serial->available()) {
       uint8_t c = _serial->read();
-      s += char(c);
+      data += char(c);
       l += (h += c);
       length--;
     } while (length);
 
   while (_serial->available() < 2);
-  if (uint8_t(_serial->read()) == h && uint8_t(_serial->read()) == l) return s;
+  if (uint8_t(_serial->read()) == h && uint8_t(_serial->read()) == l) return data;
 }

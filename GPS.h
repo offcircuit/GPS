@@ -25,7 +25,7 @@ class GPS {
   public:
     GPS(uint8_t rx, uint8_t tx);
     uint32_t begin(uint32_t speed = 0);
-    String find(char *data);
+    String find(char *buffer);
     String getDateTime();
     String getGeoposition();
     String getSatellites();
@@ -35,7 +35,7 @@ class GPS {
     bool reset(uint16_t mode = GPS_HOTSTART);
     uint32_t setBaud(uint32_t speed);
     String version();
-    void write(uint8_t *data, size_t length);
+    void write(uint8_t *buffer, size_t length);
 };
 
 #endif
