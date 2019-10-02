@@ -14,8 +14,6 @@
 #define GPS_HOTSTART 0x0000
 #define GPS_WARMSTART 0x0001
 
-#define GPS_PUBXSUM 0x33
-
 class GPS {
   private:
     SoftwareSerial *_serial;
