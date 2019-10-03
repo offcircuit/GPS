@@ -72,8 +72,8 @@ String GPS::readString() {
 }
 
 bool GPS::reset(uint16_t mode) {
-  uint8_t data[10] = {0xB5, 0x62, 0x06, 0x04, 0x04, 0x00, mode >> 8, mode & 0xFF, 0x02, 0x00};
-  write(data, 10);
+  uint8_t buffer[10] = {0xB5, 0x62, 0x06, 0x04, 0x04, 0x00, mode & 0xFF, mode >> 8, 0x02, 0x00};
+  write(buffer, 10);
   if (_serial->find(strcat(GPS_GPTXT, "01,01,02,"))) return read();
 }
 
@@ -83,15 +83,15 @@ uint32_t GPS::setBaud(uint32_t speed) {
 }
 
 String GPS::version() {
-  uint8_t data[6] = {0xB5, 0x62, 0x0A, 0x04, 0x00, 0x00};
-  write(data, 6);
+  uint8_t buffer[6] = {0xB5, 0x62, 0x0A, 0x04, 0x00, 0x00};
+  write(buffer, 6);
   return read();
 }
 
-void GPS::write(uint8_t *buffer, size_t length) {
+void GPS::write(uint8_t *data, size_t length) {
   uint8_t h = 0, l = 0;
-  for (size_t i = 2; i < length; i++) l += (h += buffer[i]);
-  _serial->write(buffer, length);
+  for (size_t i = 2; i < length; i++) l += (h += data[i]);
+  _serial->write(data, length);
   _serial->write(h);
   _serial->write(l);
 }
