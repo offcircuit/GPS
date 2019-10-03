@@ -14,7 +14,7 @@ GPS	KEYWORD1
 begin	KEYWORD2
 find  KEYWORD2
 getDateTime	KEYWORD2
-getGeoposition	KEYWORD2
+getGeolocation	KEYWORD2
 getSatellites	KEYWORD2
 print	KEYWORD2
 read	KEYWORD2
