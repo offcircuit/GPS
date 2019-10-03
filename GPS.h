@@ -4,8 +4,8 @@
 #include <sys/types.h>
 #include <SoftwareSerial.h>
 
-#define GPS_PUBX "$PUBX,"
 #define GPS_GPTXT "$GPTXT,"
+#define GPS_PUBX "$PUBX,"
 
 #define GPS_GEOLOCATION 0
 #define GPS_SATELLITES 3
@@ -25,7 +25,7 @@ class GPS {
     uint32_t begin(uint32_t speed = 0);
     String find(char *buffer);
     String getDateTime();
-    String getGeoposition();
+    String getGeolocation();
     String getSatellites();
     void print(String data);
     String read();

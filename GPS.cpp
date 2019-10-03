@@ -47,7 +47,7 @@ String GPS::getDateTime() {
   return find(GPS_PUBX);
 }
 
-String GPS::getGeoposition() {
+String GPS::getGeolocation() {
   print(String(GPS_PUBX) + prefix(GPS_GEOLOCATION, DEC));
   return find(GPS_PUBX);
 }
