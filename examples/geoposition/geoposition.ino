@@ -15,5 +15,5 @@ void setup() {
 }
 
 void loop() {
-  Serial.println(gps.getGeoposition());
+  Serial.println(gps.getGeolocation());
 }
