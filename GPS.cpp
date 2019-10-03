@@ -67,6 +67,30 @@ void GPS::print(String data) {
   _serial->println(String(char(0x24)) + data + String(char(0x2A)) + prefix(n, HEX));
 }
 
+String GPS::read() {
+  String data;
+  uint8_t h = 0, l = 0;
+  uint16_t length;
+  _serial->findUntil("µ", "b");
+
+  while (_serial->available() < 4);
+  l += (h += _serial->read());
+  l += (h += _serial->read());
+  length = _serial->read() | _serial->read() << 8;
+  l += (h += length & 0xFF);
+  l += (h += length >> 8);
+
+  do if (_serial->available()) {
+      uint8_t c = _serial->read();
+      data += char(c);
+      l += (h += c);
+      length--;
+    } while (length);
+
+  while (_serial->available() < 2);
+  if (uint8_t(_serial->read()) == h && uint8_t(_serial->read()) == l) return data;
+}
+
 String GPS::readString() {
   return find("$");
 }
@@ -94,28 +118,4 @@ void GPS::write(uint8_t *data, size_t length) {
   _serial->write(data, length);
   _serial->write(h);
   _serial->write(l);
-}
-
-String GPS::read() {
-  String data;
-  uint8_t h = 0, l = 0;
-  uint16_t length;
-  _serial->findUntil("µ", "b");
-
-  while (_serial->available() < 4);
-  l += (h += _serial->read());
-  l += (h += _serial->read());
-  length = _serial->read() | _serial->read() << 8;
-  l += (h += length & 0xFF);
-  l += (h += length >> 8);
-
-  do if (_serial->available()) {
-      uint8_t c = _serial->read();
-      data += char(c);
-      l += (h += c);
-      length--;
-    } while (length);
-
-  while (_serial->available() < 2);
-  if (uint8_t(_serial->read()) == h && uint8_t(_serial->read()) == l) return data;
 }
